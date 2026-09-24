@@ -1,4 +1,4 @@
-_This project has been created as part of the 42 curriculum by <ccrucian>, <gipaglie>_
+_This project has been created as part of the 42 curriculum by ccrucian, gipaglie_
 
 # A-Maze-ing
 
@@ -86,9 +86,9 @@ Follow the instructions printed on the terminal screen with curses
 - [BFS: Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
 
 ### Python general documentation
-- https://docs.python.org/3/
-- https://packaging.python.org/
-- https://docs.python.org/3/library/venv.html
+- [Python docs](https://docs.python.org/3/)
+- [Packaging](https://packaging.python.org/)
+- [Venv](https://docs.python.org/3/library/venv.html)
 
 ### AI Usage
 Artificial intelligence tools were used as development support, not as a replacement for understanding or writing the code.

@@ -1,0 +1,82 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+.env
+
+# IDE and editor files
+.idea/
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Vim artifacts
+*.Session
+# Vim
+*.swp
+*.swo
+*.swn
+*~
+*.un~
+
+# VS Code Artifacts
+.vscode/
+
+# Testing and coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+*.cover
+*.log
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Type checking
+.pyre/
+
+# IPython
+.ipynb_checkpoints/
+
+# Jupyter Notebook
+.ipynb
+.jupyter/
+
+# Misc
+*.bak
+*.tmp
+.cache/
+.env.local
+*.pid

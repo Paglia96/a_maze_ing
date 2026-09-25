@@ -59,7 +59,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 ```
 
-### Install dependemcies
+### Install dependencies
 ```bash
 make install
 ```
@@ -78,11 +78,9 @@ Follow the instructions printed on the terminal screen with curses
 
 ## Resources
 ### Algorithms documentation
-- [Maze Generation](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
-- [Maze-solving](https://en.wikipedia.org/wiki/Maze-solving_algorithm)
-#### Maze generation algorithms
-#### Maze solving algorithms
+#### [Maze Generation Algorithms](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
 - [DFS: Depth-first search](https://en.wikipedia.org/wiki/Depth-first_search)
+#### [Maze-solving Algorithms](https://en.wikipedia.org/wiki/Maze-solving_algorithm)
 - [BFS: Breadth-first search](https://en.wikipedia.org/wiki/Breadth-first_search)
 
 ### Python general documentation

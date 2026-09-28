@@ -1,0 +1,1 @@
+[<Wall.UP: 1>, <Wall.LEFT: 2>, <Wall.DOWN: 4>, <Wall.RIGHT: 8>]

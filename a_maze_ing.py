@@ -32,34 +32,34 @@ def main(stdscr: c.window):
         stdscr: curses standard screen
     """
     configs:dict = config_parser()
-    width: int = configs['WIDTH'] 
-    height: int = configs['HEIGHT']
     
     c.curs_set(0) # nascondi il cursore
     stdscr.nodelay(True)  # non blocca su getch()
     c.start_color()
     n_rows, n_cols = stdscr.getmaxyx()
-    horizontal_offset: int = (n_cols - (height * 4 + 1)) // 2
-    vertical_offset: int = (n_rows - (width * 2 + 1)) // 2
+    horizontal_offset: int = (n_cols - (configs['HEIGHT'] * 4 + 1)) // 2
+    vertical_offset: int = (n_rows - (configs['WIDTH'] * 2 + 1)) // 2
     c.init_pair(1, c.COLOR_RED, c.COLOR_BLACK)
     c.init_pair(2, c.COLOR_RED, c.COLOR_BLACK)
     palette: int = c.color_pair(1)
     stdscr.bkgd(' ', c.color_pair(2)) # background base
 
-    print_legend(stdscr, n_cols, n_rows, width, height)
+    print_legend(stdscr, n_cols, n_rows, configs['WIDTH'], configs['HEIGHT'])
     stdscr.refresh()
     sleep(1)   
 
-    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(width, height)
+    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(configs['WIDTH'], configs['HEIGHT'])
     
-    for row, col in product(range(width), range(height)):
+    for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_base(stdscr, palette, horizontal_offset, vertical_offset)
 
     stdscr.refresh()
     sleep(1)
 
-    for row, col in product(range(width), range(height)):
+    for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_self(stdscr, palette, horizontal_offset, vertical_offset)
+
+    maze.prim_algorithm(configs['OUTPUT_FILE'])
 
     while True:
         ch = stdscr.getch() # returna un int
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     try:
         c.wrapper(main)
     except SystemExit as e: # ArgumentParser
-        print(f'Invalid number of arguments, only one filename required', file=stderr)
+        print(f'Invalid number of arguments, only one filename required', file=sys.stderr)
     except c.error:
         print(
                 "An error occurred, probably there is "

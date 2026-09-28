@@ -4,6 +4,7 @@ from enum import IntFlag
 from dataclasses import dataclass, field
 from itertools import product
 from typing import Callable
+from random import seed, choice, randint
 
 class MazeGenerator:
     """Represents the Maze and offers tools to work with it.
@@ -32,6 +33,17 @@ class MazeGenerator:
         DOWN = 4 # 0100
         RIGHT = 8 # 1000
 
+        def opposite_wall(self) -> Maze.Wall:
+            """Receives a single wall and returns its reversed value"""
+            if self == type(self).UP:
+                return type(self).DOWN
+            if self == type(self).DOWN:
+                return type(self).UP
+            if self == type(self).LEFT:
+                return type(self).RIGHT
+            if self == type(self).RIGHT:
+                return type(self).LEFT
+            
     @dataclass
     class Cell:
         """Represent a cell of the maze.
@@ -98,6 +110,19 @@ class MazeGenerator:
                 stdscr.addstr(row + 2, col + 1, '━' * 3, palette)
                 if self.y == self.height - 1:
                     stdscr.addch(row + 2, col + 4, '┛', palette)
+        
+        def adjacent_cell(self, wall: str):
+            """Based on the cell wall received,
+            returns the coordinates of the adjacent cell"""
+            match wall:
+                case 'UP':
+                    return (self.x - 1, self.y)
+                case 'LEFT':
+                    return (self.x, self.y - 1)
+                case 'RIGHT':
+                    return (self.x, self.y + 1)
+                case 'DOWN':
+                    return (self.x + 1, self.y)
 
 
         def print_self(
@@ -146,6 +171,9 @@ class MazeGenerator:
             [self.Cell(x, y, width, height) for y in range(height)]
             for x in range(width)
         ]
+        self.r_seed = seed(1)
+        self.width = width
+        self.height = height
         
     def __getitem__(self, index):
         """Makes MazeGenerator a subscriptable object.
@@ -157,3 +185,24 @@ class MazeGenerator:
             self.maze at the required index
         """
         return self.maze[index]
+
+    def prim_algorithm(self, file):
+        seed(1)
+        cells = [self[randint(0, self.width - 1)][randint(0, self.height - 1)]]
+        #while any_wall_valid(cells):
+        cell = choice(cells) # cella a caso dalla lista di celle valide
+        wall = choice([w for w in cell.walls]) # in valid walls (implement it) avoids useless choices
+        # se non ci sono muri validi, rimuovere la cella dalla lista e continue
+        # controlla che la cella corrispondente sia not visited, altrimenti prova un altro muro
+        cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
+        wall2 = wall.opposite_wall()
+        def remove_walls(cell, cell2):
+            cell.walls &= ~wall
+            cell2.walls &= ~wall2
+        remove_walls(cell, cell2)
+        print(cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)
+
+        """
+        with open(file, 'w') as f:
+            f.write(str(list()))
+        """

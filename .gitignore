@@ -36,16 +36,15 @@ ENV/
 *.sublime-project
 *.sublime-workspace
 
-# Vim artifacts
+## Vim artifacts
 *Session*
-# Vim
 *.swp
 *.swo
 *.swn
 *~
 *.un~
 
-# VS Code Artifacts
+## VS Code Artifacts
 .vscode/
 
 # Testing and coverage

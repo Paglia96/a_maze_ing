@@ -66,6 +66,22 @@ class MazeGenerator:
         entry: bool = False
         end: bool = False
 
+        def adjacent_cell(self, wall: str):
+            """Based on the cell wall received,
+            returns the coordinates of the adjacent cell"""
+            match wall:
+                case 'UP':
+                    return (self.x - 1, self.y)
+                case 'LEFT':
+                    return (self.x, self.y - 1)
+                case 'RIGHT':
+                    return (self.x, self.y + 1)
+                case 'DOWN':
+                    return (self.x + 1, self.y)
+        
+        def remove_wall(self, wall):
+            self.walls &= ~wall
+
         def print_base(
                 self,
                 stdscr: c.window,
@@ -110,20 +126,6 @@ class MazeGenerator:
                 stdscr.addstr(row + 2, col + 1, '━' * 3, palette)
                 if self.y == self.height - 1:
                     stdscr.addch(row + 2, col + 4, '┛', palette)
-        
-        def adjacent_cell(self, wall: str):
-            """Based on the cell wall received,
-            returns the coordinates of the adjacent cell"""
-            match wall:
-                case 'UP':
-                    return (self.x - 1, self.y)
-                case 'LEFT':
-                    return (self.x, self.y - 1)
-                case 'RIGHT':
-                    return (self.x, self.y + 1)
-                case 'DOWN':
-                    return (self.x + 1, self.y)
-
 
         def print_self(
                 self,
@@ -194,12 +196,11 @@ class MazeGenerator:
         wall = choice([w for w in cell.walls]) # in valid walls (implement it) avoids useless choices
         # se non ci sono muri validi, rimuovere la cella dalla lista e continue
         # controlla che la cella corrispondente sia not visited, altrimenti prova un altro muro
+        # controlla che il muro sia rompibile (non bordo, non 42)
         cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
         wall2 = wall.opposite_wall()
-        def remove_walls(cell, cell2):
-            cell.walls &= ~wall
-            cell2.walls &= ~wall2
-        remove_walls(cell, cell2)
+        cell.remove_wall(wall)
+        cell2.remove_wall(wall2)
         print(cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)
 
         """

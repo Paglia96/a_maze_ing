@@ -6,6 +6,13 @@ from itertools import product
 from typing import Callable
 
 class MazeGenerator:
+    """Represents the Maze and offers tools to work with it.
+
+    Attributes:
+        width: width of the labyrinth
+        height: height of the labirinth
+        maze: the labirinth
+    """
     class Wall(IntFlag):
         """Represent wall states as bitmask values.
 
@@ -27,6 +34,15 @@ class MazeGenerator:
 
     @dataclass
     class Cell:
+        """Represent a cell of the maze.
+
+        Attributes:
+            x: row position in the matrix
+            y: column position in the matrix
+            width: total width of the matrix
+            height: total height of the matrix
+            walls: instance of the Wall class
+        """
         x: int
         y: int
         width: int
@@ -45,6 +61,18 @@ class MazeGenerator:
                 horizontal_offset: int,
                 vertical_offset: int
                 ):
+            """Print only the sides of the cell that will not change
+            Args:
+                stdscr: the curses standard screen
+                palette: an int representing the curses color palette
+                horizontal_offset: the horizontal offset calculated to print
+                    the x axys of the labirinth centered on the stdscr
+                vertical_offset: the vertical offset calculated to print
+                    the y axys of the labirinth centered on the stdscr
+
+            Returns:
+                None 
+            """
             row = (self.x * 2) + vertical_offset
             col = (self.y * 4) + horizontal_offset
             if not self.x:
@@ -79,7 +107,21 @@ class MazeGenerator:
                 horizontal_offset: int,
                 vertical_offset: int
                 ):
-            "Prints walls. It prints right and down, up and left only if you're on the border cells'"
+            """Print walls or spaces if there is no walls.
+                    It prints:
+                        -right and down of the cell;
+                        -up and left if the cell is a border cell
+            Args:
+                stdscr: the curses standard screen
+                palette: an int representing the curses color palette
+                horizontal_offset: the horizontal offset calculated to print
+                    the x axys of the labirinth centered on the stdscr
+                vertical_offset: the vertical offset calculated to print
+                    the y axys of the labirinth centered on the stdscr
+
+            Returns:
+                None 
+            """
             row = (self.x * 2) + vertical_offset
             col = (self.y * 4) + horizontal_offset
             if self.walls.DOWN:
@@ -92,13 +134,26 @@ class MazeGenerator:
             width: int,
             height: int,
             ):
+        """
+        Initialize a maze generator instance
+
+        Args:
+            width: width of the labyrinth
+            height: height of the labyrinth
+            maze: the matrix representation of a labyrinth
+        """
         self.maze: list[list[MazeGenerator.Cell]] = [
-                                    [
-                                    self.Cell(
-                                        x,
-                                        y,
-                                        width,
-                                        height,
-                                        ) for y in range(height)
-                                    ] for x in range(width)
-                                    ]
+            [self.Cell(x, y, width, height) for y in range(height)]
+            for x in range(width)
+        ]
+        
+    def __getitem__(self, index):
+        """Makes MazeGenerator a subscriptable object.
+
+        Raises:
+            IndexError: if the given index is out of range
+
+        Returns:
+            self.maze at the required index
+        """
+        return self.maze[index]

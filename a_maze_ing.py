@@ -23,6 +23,14 @@ def print_legend(stdscr, n_cols, n_rows, width, height):
     stdscr.attroff(c.A_REVERSE)
 
 def main(stdscr: c.window):
+    """Main function of the program.
+        Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
+        path from a randomly genereted starting point to a randomly genereted
+        ending point. The all process is animated through curses.
+
+    Args:
+        stdscr: curses standard screen
+    """
     configs:dict = config_parser()
     width: int = configs['WIDTH'] 
     height: int = configs['HEIGHT']
@@ -42,7 +50,7 @@ def main(stdscr: c.window):
     stdscr.refresh()
     sleep(1)   
 
-    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(width, height).maze
+    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(width, height)
     
     for row, col in product(range(width), range(height)):
         maze[row][col].print_base(stdscr, palette, horizontal_offset, vertical_offset)
@@ -59,7 +67,7 @@ def main(stdscr: c.window):
             break
 
 if __name__ == "__main__":
-    from sys import stderr
+    import sys
     try:
         c.wrapper(main)
     except SystemExit as e: # ArgumentParser
@@ -72,11 +80,11 @@ if __name__ == "__main__":
                 "-enlarging the shell window\n"
                 "-reducing its screen size (ctrl -)\n"
                 "-decrementing the config file variables WIDTH and HEIGHT",
-                file=stderr
+                file=sys.stderr
                 )
-        raise SystemExit(1) 
+        sys.exit(1)
     except Exception as e:
-        print(e, file=stderr)
+        print(e, file=sys.stderr)
         import traceback # da usare solo in development
         traceback.print_exc()
         raise SystemExit(1)

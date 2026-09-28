@@ -14,11 +14,11 @@ def config_parser():
             ``PERFECT`` is a boolean.
 
     Raises:
+        SystemExit: if the number of given arguments is different from 1.
         ValueError: If a configuration line is malformed or a mandatory
             configuration key is missing.
         FileNotFoundError: If the specified configuration file does not exist.
         PermissionError: If the configuration file cannot be opened.
-        argparse.ArgumentError: If the command-line arguments are invalid.
     """
     parser = ArgumentParser(
             description='Receives the maze configuration settings as an argument'

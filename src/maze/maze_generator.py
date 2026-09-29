@@ -226,6 +226,7 @@ class MazeGenerator:
             continue
         cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
         wall2 = wall.opposite_wall()
+        # commento
         cell.remove_wall(wall)
         cell2.remove_wall(wall2)
         print(cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)

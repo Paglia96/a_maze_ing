@@ -42,7 +42,7 @@ def main(stdscr: c.window):
     c.init_pair(1, c.COLOR_RED, c.COLOR_BLACK)
     c.init_pair(2, c.COLOR_RED, c.COLOR_BLACK)
     palette: int = c.color_pair(1)
-    stdscr.bkgd(' ', c.color_pair(2)) # background base
+    stdscr.bkgd(' ', c.color_pair(2)) # background base scusa
 
     print_legend(stdscr, n_cols, n_rows, configs['WIDTH'], configs['HEIGHT'])
     stdscr.refresh()

@@ -33,7 +33,7 @@ class MazeGenerator:
         DOWN = 4 # 0100
         LEFT = 8 # 1000
 
-        def opposite_wall(self) -> Maze.Wall:
+        def opposite_wall(self) -> "MazeGenerator.Wall":
             """Receives a single wall and returns its reversed value"""
             if self == type(self).UP:
                 return type(self).DOWN
@@ -59,7 +59,7 @@ class MazeGenerator:
         y: int
         width: int
         height: int
-        walls: MazeGenerator.Wall = field(
+        walls: "MazeGenerator.Wall" = field(
                 default_factory=lambda: MazeGenerator.Wall(0xF)
                 )
         is_visited: bool = False
@@ -132,7 +132,8 @@ class MazeGenerator:
                 stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
-                vertical_offset: int
+                vertical_offset: int,
+                algorithm: bool = False
                 ):
             """Print walls or spaces if there is no walls.
                     It prints:
@@ -151,10 +152,19 @@ class MazeGenerator:
             """
             row = (self.x * 2) + vertical_offset
             col = (self.y * 4) + horizontal_offset
-            if self.walls.DOWN:
+            if self.walls & MazeGenerator.Wall.DOWN:
                 stdscr.addstr(row + 2, col + 1, '━' * 3, palette)
-            if self.walls.RIGHT:
+            else:
+                stdscr.addstr(row + 2, col + 1, ' ' * 3, palette)
+            if self.walls & MazeGenerator.Wall.RIGHT:
                 stdscr.addch(row + 1, col + 4, '┃', palette)
+            else:
+                stdscr.addstr(row + 1, col + 4, ' ', palette)
+            
+            if algorithm:
+                stdscr.refresh()
+                sleep(0.15 / (self.height * self.width))
+
     
     def __init__(
             self,
@@ -219,7 +229,11 @@ class MazeGenerator:
                 valid_walls.append(wall)
         return valid_walls
 
-    def prim_algorithm(self, file):
+    def prim_algorithm(self, file, stdscr: c.window,
+                palette: int,
+                horizontal_offset: int,
+                vertical_offset: int
+                ):
         seed(2)
         cells = [self.random_valid_starting_cell()]
         cells[0].is_visited = True
@@ -236,6 +250,7 @@ class MazeGenerator:
             wall2 = wall.opposite_wall()
             cell.remove_wall(wall)
             cell2.remove_wall(wall2)
+            cell.print_self(stdscr, palette, horizontal_offset, vertical_offset, True)
         # print(wall.name, cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)
         with open(file, 'w') as f:
             pass

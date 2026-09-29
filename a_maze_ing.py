@@ -22,15 +22,8 @@ def print_legend(stdscr, n_cols, n_rows, width, height):
     stdscr.addstr(top_y, (n_cols - len(amazing)) // 2, amazing)
     stdscr.attroff(c.A_REVERSE)
 
-def main(stdscr: c.window):
-    """Main function of the program.
-        Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
-        path from a randomly genereted starting point to a randomly genereted
-        ending point. The all process is animated through curses.
-
-    Args:
-        stdscr: curses standard screen
-    """
+def curses(stdscr: c.window):
+    
     configs:dict = config_parser()
     
     c.curs_set(0) # nascondi il cursore
@@ -48,8 +41,12 @@ def main(stdscr: c.window):
     stdscr.refresh()
     sleep(1)   
 
+    
+   
     maze: list[list[MazeGenerator.Cell]] = MazeGenerator(configs['WIDTH'], configs['HEIGHT'])
     
+
+
     for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_base(stdscr, palette, horizontal_offset, vertical_offset)
 
@@ -58,18 +55,36 @@ def main(stdscr: c.window):
 
     for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_self(stdscr, palette, horizontal_offset, vertical_offset)
+    
+    stdscr.refresh()
+    sleep(1)
 
-    maze.prim_algorithm(configs['OUTPUT_FILE'])
+    maze.prim_algorithm(configs['OUTPUT_FILE'], stdscr, palette, horizontal_offset, vertical_offset)
+
+    stdscr.refresh()
+    sleep(1)
 
     while True:
         ch = stdscr.getch() # returna un int
         if ch == ord('q'): # fai il confronto su un int
             break
 
+def main():
+    """Main function of the program.
+        Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
+        path from a randomly genereted starting point to a randomly genereted
+        ending point. The all process is animated through curses.
+
+    Args:
+        stdscr: curses standard screen
+    """
+    c.wrapper(curses)
+    
+
 if __name__ == "__main__":
     import sys
     try:
-        c.wrapper(main)
+        main()
     except SystemExit as e: # ArgumentParser
         print(f'Invalid number of arguments, only one filename required', file=sys.stderr)
     except c.error:

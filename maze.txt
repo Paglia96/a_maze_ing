@@ -1,1 +1,5 @@
-[<Wall.UP: 1>, <Wall.LEFT: 2>, <Wall.DOWN: 4>, <Wall.RIGHT: 8>]
+97bbb
+85002
+ed2aa
+d16aa
+d6d6e

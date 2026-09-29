@@ -29,11 +29,11 @@ class MazeGenerator:
         """
 
         UP = 1 # 0001
-        LEFT = 2 # 0010
+        RIGHT = 2 # 0010
         DOWN = 4 # 0100
-        RIGHT = 8 # 1000
+        LEFT = 8 # 1000
 
-        def opposite_wall(self) -> Maze.Wall:
+        def opposite_wall(self) -> "MazeGenerator.Wall":
             """Receives a single wall and returns its reversed value"""
             if self == type(self).UP:
                 return type(self).DOWN
@@ -59,7 +59,7 @@ class MazeGenerator:
         y: int
         width: int
         height: int
-        walls: MazeGenerator.Wall = field(
+        walls: "MazeGenerator.Wall" = field(
                 default_factory=lambda: MazeGenerator.Wall(0xF)
                 )
         is_visited: bool = False
@@ -188,49 +188,20 @@ class MazeGenerator:
         """
         return self.maze[index]
 
-    def prim_algorithm(self, file):
-        seed(1)
-        cells = [self[randint(0, self.width - 1)][randint(0, self.height - 1)]]
-        #while any_wall_valid(cells):
-        cell = choice(cells) # cella a caso dalla lista di celle valide
-        def valid_walls(cell):
-            """Receives a cell and returns a list of walls considered valid
-            The wall of a cell is considered valid if:
-            -the adjacent cell is still not visited
-            -the wall is breakable (not an edge of the maze, not part of the 42 logo)
-            """
-            walls = [wall for wall in cell.walls]
-            valid_walls = []
-            for wall in walls:
-                if cell.x == 0:
-                    if wall.name == 'UP' or 
-                        (cell.y == 0 and wall.name == 'LEFT') or 
-                        (cell.y == height - 1) and wall.name == 'RIGHT'):
-                        continue
-                if cell.x == width - 1:
-                    if wall.name == 'DOWN' or 
-                        (cell.y == 0 and wall.name == 'LEFT') or
-                        (cell.y == height - 1) and wall.name == 'RIGHT':
-                            continue
-                if (cell.y == 0 and wall.name == 'LEFT') or
-                    (cell.y == height - 1 and wall.name == 'RIGHT'):
-                    continue
-                cell2 = self.maze[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
-                if not cell2.is_visited:
-                    valid_walls.append(wall)
-            return valid_walls
-        try:
-            wall = choice([w for w in valid_walls(cell)]) # in valid walls (implement it) avoids useless choices
-        except IndexError: # choice riceve lista vuota
-            # rimuovi la cella dalla lista
-            continue
-        cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
-        wall2 = wall.opposite_wall()
-        cell.remove_wall(wall)
-        cell2.remove_wall(wall2)
-        print(cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)
 
-        """
-        with open(file, 'w') as f:
-            f.write(str(list()))
-        """
+    def get_random_cell(self):
+        x = randint(0, self.width - 1)
+        y = randint(0, self.height - 1)
+        cell = self[x][y]
+        return cell
+
+    def dfs(self):
+        cell = get_random_cell()
+        cell.is_visited = True
+        stack = []
+        stack.append(cell)
+        while stack:
+            current = stack[-1]
+            
+
+

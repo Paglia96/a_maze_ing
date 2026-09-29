@@ -59,7 +59,6 @@ def main(stdscr: c.window):
     for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_self(stdscr, palette, horizontal_offset, vertical_offset)
 
-    maze.prim_algorithm(configs['OUTPUT_FILE'])
 
     while True:
         ch = stdscr.getch() # returna un int

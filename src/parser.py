@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from random import seed, choice
 
 def config_parser():
     """Parse and validate the maze configuration file.

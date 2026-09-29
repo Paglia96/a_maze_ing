@@ -59,8 +59,23 @@ def curses(stdscr: c.window):
     stdscr.refresh()
     sleep(1)
 
-    maze.prim_algorithm(configs['OUTPUT_FILE'], stdscr, palette, horizontal_offset, vertical_offset)
+    maze.prim_algorithm(stdscr, palette, horizontal_offset, vertical_offset)
 
+    stdscr.refresh()
+    sleep(1)
+#
+#    for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
+#        maze[row][col].print_self(stdscr, palette, horizontal_offset, vertical_offset)
+    
+    with open(configs['OUTPUT_FILE'], 'w') as f:
+        pass
+
+    with open(configs['OUTPUT_FILE'], 'w') as f:
+        for row in range(configs['WIDTH']):
+            for col in range(configs['HEIGHT']):
+                f.write(f'{maze[row][col].walls:x}')
+            f.write('\n')
+    
     stdscr.refresh()
     sleep(1)
 

@@ -133,7 +133,6 @@ class MazeGenerator:
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int,
-                algorithm: bool = False
                 ):
             """Print walls or spaces if there is no walls.
                     It prints:
@@ -152,18 +151,18 @@ class MazeGenerator:
             """
             row = (self.x * 2) + vertical_offset
             col = (self.y * 4) + horizontal_offset
-            if self.walls & MazeGenerator.Wall.DOWN:
-                stdscr.addstr(row + 2, col + 1, '━' * 3, palette)
-            else:
-                stdscr.addstr(row + 2, col + 1, ' ' * 3, palette)
-            if self.walls & MazeGenerator.Wall.RIGHT:
-                stdscr.addch(row + 1, col + 4, '┃', palette)
-            else:
-                stdscr.addstr(row + 1, col + 4, ' ', palette)
-            
-            if algorithm:
-                stdscr.refresh()
-                sleep(0.15 / (self.height * self.width))
+            stdscr.addstr(
+                row + 2,
+                col + 1,
+                '━' * 3 if self.walls & MazeGenerator.Wall.DOWN else '   ',
+                palette
+            )
+            stdscr.addch(
+                row + 1,
+                col + 4,
+                '┃' if self.walls & MazeGenerator.Wall.RIGHT else ' ',
+                palette
+            )
 
     
     def __init__(
@@ -229,12 +228,12 @@ class MazeGenerator:
                 valid_walls.append(wall)
         return valid_walls
 
-    def prim_algorithm(self, file, stdscr: c.window,
+    def prim_algorithm(self, stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int
                 ):
-        seed(2)
+        seed(7)
         cells = [self.random_valid_starting_cell()]
         cells[0].is_visited = True
         while cells:
@@ -250,13 +249,7 @@ class MazeGenerator:
             wall2 = wall.opposite_wall()
             cell.remove_wall(wall)
             cell2.remove_wall(wall2)
-            cell.print_self(stdscr, palette, horizontal_offset, vertical_offset, True)
-        # print(wall.name, cell.walls, cell2.walls, sep='\n') # (cell, wall.name, cell2, wall2.name)
-        with open(file, 'w') as f:
-            pass
-
-        with open(file, 'w') as f:
-            for row in range(self.width):
-                for col in range(self.height):
-                    f.write(f'{self[row][col].walls:x}')
-                f.write('\n')
+            cell.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+            cell2.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+            stdscr.refresh()
+            sleep(2 / (self.height * self.width))

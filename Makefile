@@ -8,6 +8,9 @@ install:
 run:
 	python3 $(MAIN) $(CONFIG)
 
+runcarli:
+	python3.12 $(MAIN) $(CONFIG)
+
 debug:
 	python -m pdb $(MAIN) $(CONFIG)
 

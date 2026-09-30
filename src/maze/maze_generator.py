@@ -63,6 +63,8 @@ class MazeGenerator:
                 default_factory=lambda: MazeGenerator.Wall(0xF)
                 )
         is_visited: bool = False
+        ft_logo: bool = False
+
         entry: bool = False
         end: bool = False
 
@@ -178,10 +180,40 @@ class MazeGenerator:
             height: height of the labyrinth
             maze: the matrix representation of a labyrinth
         """
-        self.maze: list[list[MazeGenerator.Cell]] = [
-            [self.Cell(x, y, width, height) for y in range(height)]
-            for x in range(width)
+        """
+        Maze minimum width 8 min height 6
+        to find horizontal_offset= (maze_width - ft_width) /2
+        vertical_offset= (maze_height - ft_height) /2
+        Logo width x height 7 x 4
+        
+        """
+        self.horizontal_offset: int = (width - 5) // 2
+        self.vertical_offset: int = (height - 7) // 2
+        
+        self.ft_logo = [
+            [0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2],
+            [0, 4], [0, 5], [0, 6], [1, 6], [2, 4], [2, 5],
+            [2, 6], [3, 4], [4, 4], [4, 5], [4, 6]
         ]
+
+        for cell in self.ft_logo:
+            cell[0] += self.horizontal_offset
+            cell[1] += self.vertical_offset
+
+        self.maze: list[list[MazeGenerator.Cell]] = []
+
+        for x in range(width):
+            rows: list[MazeGenerator.Cell] = []
+            for y in range(height):
+                for ft_x, ft_y in self.ft_logo:
+                    if ft_x == x and ft_y == y:
+                        rows.append(self.Cell(x, y, width, height, ft_logo=True))
+                        break
+                else:
+                    rows.append(self.Cell(x, y, width, height, ft_logo=False))
+            self.maze.append(rows)
+
+
         self.width = width
         self.height = height
 
@@ -198,11 +230,11 @@ class MazeGenerator:
         return self.maze[index]
     
     def random_valid_starting_cell(self):
-        # AGGIUNGERE controllo se la cella e' valida: non parte della scritta 42
-        # ciclando su questi tre sotto finche' non trova una valid cell
         row = randint(0, self.width - 1)
         col = randint(0, self.height - 1)
-        cell = self[row][col]
+        while (cell := self[(row)][col]).ft_logo is True:
+            row = randint(0, self.width - 1)
+            col = randint(0, self.height - 1)
         return cell
     
     def valid_walls(self, cell):
@@ -211,7 +243,6 @@ class MazeGenerator:
         -the adjacent cell is still not visited
         -the wall is breakable (not an edge of the maze, not part of the 42 logo)
         """
-        # ANCORA DA GESTIRE IL CHECK del 42
         walls = [wall for wall in cell.walls]
         valid_walls = []
         for wall in walls:
@@ -224,6 +255,8 @@ class MazeGenerator:
             if (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
                 continue
             cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
+            if cell2.ft_logo is True:
+                continue
             if not cell2.is_visited:
                 valid_walls.append(wall)
         return valid_walls
@@ -289,7 +322,7 @@ class MazeGenerator:
                 current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
                 adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
                 stdscr.refresh()
-                sleep(10 / (self.height * self.width))
+                sleep(2 / (self.height * self.width))
         
 
 

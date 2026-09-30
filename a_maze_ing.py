@@ -68,7 +68,7 @@ def curses(stdscr: c.window):
                 configs['SEED']
                 )
     else:
-        maze.dfs(stdscr, palette, horizontal_offset, vertical_offset)
+        maze.dfs(stdscr, palette, horizontal_offset, vertical_offset, configs['SEED'])
     stdscr.refresh()
     sleep(1)
 #

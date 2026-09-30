@@ -1,7 +1,7 @@
 # Required
 
 WIDTH=15
-HEIGHT=20 # comment to ignore
+HEIGHT=40 # comment to ignore
 ENTRY=0,0
 EXIT=19,14
 OUTPUT_FILE=maze.txt
@@ -9,7 +9,7 @@ PERFECT=False
 
 # Optional
 
-SEED=10
+SEED=79
 GEN_ALGORITHM=prim
 SOLVING_ALGORITHM=to_add
 

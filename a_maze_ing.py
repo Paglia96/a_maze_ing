@@ -59,8 +59,12 @@ def curses(stdscr: c.window):
     stdscr.refresh()
     sleep(1)
 
-    maze.prim_algorithm(stdscr, palette, horizontal_offset, vertical_offset)
+ #   maze.prim_algorithm(stdscr, palette, horizontal_offset, vertical_offset)
 
+ #   stdscr.refresh()
+ #   sleep(1)
+
+    maze.dfs(stdscr, palette, horizontal_offset, vertical_offset)
     stdscr.refresh()
     sleep(1)
 #

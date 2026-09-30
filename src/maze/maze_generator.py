@@ -263,20 +263,31 @@ class MazeGenerator:
             closest_cells.append((cell2, wall))
         return closest_cells
 
-    def dfs(self):
+    def dfs(self, stdscr: c.window,
+                palette: int,
+                horizontal_offset: int,
+                vertical_offset: int,
+                seed_rand: int
+                ):
+        seed(seed_rand)
         cell = self.random_valid_starting_cell()
         cell.is_visited = True
         stack = []
         stack.append(cell)
         while stack:
-            current = stack.pop
-            closest = valid_closest_cells(cell)
+            current = stack.pop()
+            closest = self.valid_closest_cells(current)
             if closest:
-                stack.apend(current)
+                stack.append(current)
                 adjacent, wall = choice(closest)
                 current.remove_wall(wall)
                 adjacent.remove_wall(wall.opposite_wall())
                 adjacent.is_visited = True
                 stack.append(adjacent)
+                current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+                adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+                stdscr.refresh()
+                sleep(10 / (self.height * self.width))
+        
 
 

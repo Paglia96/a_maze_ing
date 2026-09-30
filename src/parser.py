@@ -36,10 +36,10 @@ def config_parser():
                 'OUTPUT_FILE',
                 'PERFECT'
                 ]
-        additional_keys: list[str] = [
+        optional_keys: list[str] = [
                 'SEED',
-                'ALGORITHM',
-                'DISPLAY_MODE'
+                'GEN_ALGORITHM',
+                'SOLVING_ALGORITHM'
                 ]
         for line in f:
             if line.startswith('#') or line == '\n':
@@ -53,11 +53,14 @@ def config_parser():
                         )
             config[0] = config[0].strip()
             config[1] = config[1][:-1].strip()  # remove ending \n e spaces
-            if (key := config[0].upper()) in config_keys:
-                config_keys.remove(key)
-                if key in configs:
-                    raise ValueError('Just one KEY for allowed type.')
-                configs[key] = config[1]
+            def upload_key(config, configs, keys_list):
+                if (key := config[0].upper()) in keys_list:
+                    keys_list.remove(key)
+                    if key in configs:
+                        raise ValueError('Just one KEY for allowed type.')
+                    configs[key] = config[1]
+            upload_key(config, configs, config_keys)
+            upload_key(config, configs, optional_keys)
         if len(config_keys):
             raise ValueError(f'Mandatory keys: {config_keys}')
     configs['WIDTH'] = int(configs['WIDTH'])
@@ -65,4 +68,15 @@ def config_parser():
     configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
     configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
     configs['PERFECT'] = bool(configs['PERFECT'])
+    configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
+    if 'GEN_ALGORITHM' in configs:
+        value = configs['GEN_ALGORITHM'].lower()
+        configs['GEN_ALGORITHM'] = value if value in ['prim', 'bfs'] else 'prim'
+    else:
+        configs['GEN_ALGORITHM'] = 'prim'
+    if 'SOLVING_ALGORITHM' in configs:
+        value = configs['SOLVING_ALGORITHM'].lower()
+        configs['SOLVING_ALGORITHM'] = value if value in ['prim', 'bfs'] else 'prim'
+    else:
+        configs['SOLVING_ALGORITHM'] = 'prim'
     return configs

@@ -2,7 +2,7 @@ from src import *
 import curses as c
 from src.maze.maze_generator import MazeGenerator
 
-#stdscr.addstr(row + 1, col + 1, '🐭', palette)
+#stdscr.addstr(row + 1, col + 1, '🐭 😿', palette)
 #stdscr.addstr(row + 1, col + 1, '🧀', palette)
 def print_legend(stdscr, n_cols, n_rows, width, height):
     legend = "q = quit | and | other | commands"
@@ -41,12 +41,12 @@ def curses(stdscr: c.window):
     stdscr.refresh()
     sleep(1)   
 
-    
    
-    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(configs['WIDTH'], configs['HEIGHT'])
-    
-
-
+    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(
+            configs['WIDTH'],
+            configs['HEIGHT'],
+            )
+ 
     for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
         maze[row][col].print_base(stdscr, palette, horizontal_offset, vertical_offset)
 
@@ -58,13 +58,17 @@ def curses(stdscr: c.window):
     
     stdscr.refresh()
     sleep(1)
-
- #   maze.prim_algorithm(stdscr, palette, horizontal_offset, vertical_offset)
-
- #   stdscr.refresh()
- #   sleep(1)
-
-    maze.dfs(stdscr, palette, horizontal_offset, vertical_offset)
+    
+    if configs['GEN_ALGORITHM'] == 'prim':
+        maze.prim_algorithm(
+                stdscr,
+                palette,
+                horizontal_offset,
+                vertical_offset,
+                configs['SEED']
+                )
+    else:
+        maze.dfs(stdscr, palette, horizontal_offset, vertical_offset)
     stdscr.refresh()
     sleep(1)
 #

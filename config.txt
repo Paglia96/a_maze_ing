@@ -1,10 +1,15 @@
+# Required
+
 WIDTH=15
-HEIGHT=20
+HEIGHT=20 # comment to ignore
 ENTRY=0,0
 EXIT=19,14
 OUTPUT_FILE=maze.txt
 PERFECT=False
-SEED=to_add
 
-# comment to ignore
-# you can add additional key-value pairs (seed, algorithm, display mode)
+# Optional
+
+SEED=10
+GEN_ALGORITHM=prim
+SOLVING_ALGORITHM=to_add
+

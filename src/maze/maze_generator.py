@@ -168,7 +168,7 @@ class MazeGenerator:
     def __init__(
             self,
             width: int,
-            height: int,
+            height: int
             ):
         """
         Initialize a maze generator instance
@@ -182,9 +182,9 @@ class MazeGenerator:
             [self.Cell(x, y, width, height) for y in range(height)]
             for x in range(width)
         ]
-        self.r_seed = seed(1)
         self.width = width
         self.height = height
+
         
     def __getitem__(self, index):
         """Makes MazeGenerator a subscriptable object.
@@ -231,10 +231,11 @@ class MazeGenerator:
     def prim_algorithm(self, stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
-                vertical_offset: int
+                vertical_offset: int,
+                seed_rand: int
                 ):
-        seed(7)
-        cells = [self.random_valid_starting_cell()]
+        seed(seed_rand)
+        cells: list = [self.random_valid_starting_cell()]
         cells[0].is_visited = True
         while cells:
             cell = choice(cells)
@@ -249,6 +250,7 @@ class MazeGenerator:
             wall2 = wall.opposite_wall()
             cell.remove_wall(wall)
             cell2.remove_wall(wall2)
+
             cell.print_self(stdscr, palette, horizontal_offset, vertical_offset)
             cell2.print_self(stdscr, palette, horizontal_offset, vertical_offset)
             stdscr.refresh()

@@ -8,7 +8,7 @@ def refresh_and_sleep(seconds: float, stdscr):
     stdscr.refresh()
     sleep(seconds)
 
-def print_legend(stdscr, configs):
+def print_legend(stdscr: curses.window, configs: dict):
     legend = "q = quit | c = color palette | g = maze generation algorithm"
     amazing = "A_MAZE_ING project from ccrucian and gipaglie"
 
@@ -28,7 +28,7 @@ def print_legend(stdscr, configs):
     
     refresh_and_sleep(1, stdscr)
 
-def generate_maze(configs, maze, stdscr, color_pairs):
+def generate_maze(configs, maze, stdscr: curses.window, color_pairs):
     if configs['GEN_ALGORITHM'] == 'prim':
         maze.prim_algorithm(
                 stdscr,
@@ -48,7 +48,7 @@ def generate_maze(configs, maze, stdscr, color_pairs):
     refresh_and_sleep(1, stdscr)
 
 def print_matrix(configs, maze, stdscr, color_pairs):
-    def print_step(configs, maze, stdscr, color_pairs, print_method):
+    def print_step(configs, maze, stdscr: curses.window, color_pairs, print_method):
         for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
             print_method(
                 maze[row][col],

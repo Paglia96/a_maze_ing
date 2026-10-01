@@ -1,15 +1,15 @@
 # Required
 
-WIDTH=15
-HEIGHT=20 # comment to ignore
-ENTRY=0,0
-EXIT=19,14
-OUTPUT_FILE=maze.txt
-PERFECT=False
+WIDTH=15 # int
+HEIGHT=20 # int
+ENTRY=0,0 # int, int
+EXIT=19,14 # int, int
+OUTPUT_FILE=maze.txt # file name
+PERFECT=False # bool
 
 # Optional
 
-SEED=10
-GEN_ALGORITHM=dfs
+SEED=10 # int
+GEN_ALGORITHM=prim # dfs | prim
 SOLVING_ALGORITHM=to_add
 

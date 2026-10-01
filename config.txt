@@ -10,6 +10,6 @@ PERFECT=False
 # Optional
 
 SEED=10
-GEN_ALGORITHM=prim
+GEN_ALGORITHM=dfs
 SOLVING_ALGORITHM=to_add
 

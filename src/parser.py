@@ -71,7 +71,7 @@ def config_parser():
     configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
     if 'GEN_ALGORITHM' in configs:
         value = configs['GEN_ALGORITHM'].lower()
-        configs['GEN_ALGORITHM'] = value if value in ['prim', 'bfs'] else 'prim'
+        configs['GEN_ALGORITHM'] = value if value in ['prim', 'dfs'] else 'prim'
     else:
         configs['GEN_ALGORITHM'] = 'prim'
     if 'SOLVING_ALGORITHM' in configs:

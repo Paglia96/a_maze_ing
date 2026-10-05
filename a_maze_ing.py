@@ -4,11 +4,11 @@ from src.maze.maze_generator import MazeGenerator
 
 #stdscr.addstr(row + 1, col + 1, '🐭 😿', fg_red_bg_black)
 #stdscr.addstr(row + 1, col + 1, '🧀', fg_red_bg_black)
-def refresh_and_sleep(seconds: float, stdscr):
+def refresh_and_sleep(seconds: float, stdscr: curses.window):
     stdscr.refresh()
     sleep(seconds)
 
-def print_legend(stdscr, configs):
+def print_legend(stdscr: curses.window, configs: dict):
     legend = "q = quit | c = color palette | g = maze generation algorithm"
     amazing = "A_MAZE_ING project from ccrucian and gipaglie"
 
@@ -28,7 +28,7 @@ def print_legend(stdscr, configs):
     
     refresh_and_sleep(1, stdscr)
 
-def generate_maze(configs, maze, stdscr, color_pairs):
+def generate_maze(configs: dict, maze, stdscr: curses.window, color_pairs):
     if configs['GEN_ALGORITHM'] == 'prim':
         maze.prim_algorithm(
                 stdscr,
@@ -47,8 +47,8 @@ def generate_maze(configs, maze, stdscr, color_pairs):
                 )
     refresh_and_sleep(1, stdscr)
 
-def print_matrix(configs, maze, stdscr, color_pairs):
-    def print_step(configs, maze, stdscr, color_pairs, print_method):
+def print_matrix(configs: dict, maze, stdscr: curses.window, color_pairs):
+    def print_step(configs: dict, maze, stdscr: curses.window, color_pairs, print_method):
         for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
             print_method(
                 maze[row][col],
@@ -72,7 +72,7 @@ def maze_stats_to_txt(configs: dict, maze: MazeGenerator):
             f.write('\n')
 
 
-def inferred_configs(configs, stdscr):
+def inferred_configs(configs: dict, stdscr: curses.window):
     n_rows, n_cols = stdscr.getmaxyx()
     horizontal_offset: int = (n_cols - (configs['HEIGHT'] * 4 + 1)) // 2
     vertical_offset: int = (n_rows - (configs['WIDTH'] * 2 + 1)) // 2

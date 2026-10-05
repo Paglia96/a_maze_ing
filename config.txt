@@ -1,6 +1,6 @@
 # Required
 
-WIDTH=15 # int
+WIDTH=20 # int
 HEIGHT=20 # int
 ENTRY=0,0 # int, int
 EXIT=19,14 # int, int

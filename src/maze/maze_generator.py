@@ -165,6 +165,8 @@ class MazeGenerator:
                 '┃' if self.walls & MazeGenerator.Wall.RIGHT else ' ',
                 palette
             )
+            if self.ft_logo:
+                stdscr.addstr(row + 1, col + 1, 'X' * 3, palette)
 
     
     def __init__(

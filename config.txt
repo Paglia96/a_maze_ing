@@ -1,7 +1,7 @@
 # Required
 
-WIDTH=15 # int
-HEIGHT=20 # int
+WIDTH=10 # int
+HEIGHT=10 # int
 ENTRY=0,0 # int, int
 EXIT=19,14 # int, int
 OUTPUT_FILE=maze.txt # file name

@@ -1,16 +1,23 @@
 from src import *
 import curses
 from src.maze.maze_generator import MazeGenerator
-
+Maze = type[list[list[MazeGenerator.Cell]]]
 #stdscr.addstr(row + 1, col + 1, '🐭 😿', fg_red_bg_black)
 #stdscr.addstr(row + 1, col + 1, '🧀', fg_red_bg_black)
-def refresh_and_sleep(seconds: float, stdscr):
+def refresh_and_sleep(seconds: float, stdscr: curses.window):
     stdscr.refresh()
     sleep(seconds)
 
 def print_legend(stdscr: curses.window, configs: dict):
-    legend = "q = quit | c = color palette | g = maze generation algorithm"
-    amazing = "A_MAZE_ING project from ccrucian and gipaglie"
+    amazing = " A_MAZE_ING project from ccrucian and gipaglie "
+    legends = [
+            'l = matrix refresh | q = quit | r = reset',
+            "m = generate maze | d = decrement speed | i = increment speed",
+            f"g = generation algorithm (current: {configs['GEN_ALGORITHM']})",
+            "p = pathfinder | "
+            f"p = pathfinder algorithm (current: {configs['GEN_ALGORITHM']})",
+            "c = color palette | s = change seed | w = width++ | h = height++",
+            ]
 
     maze_height = configs['WIDTH'] * 2 + 1
     maze_top = (configs['ROWS'] - maze_height) // 2
@@ -20,49 +27,50 @@ def print_legend(stdscr: curses.window, configs: dict):
     bottom_y = maze_bottom + (configs['ROWS'] - maze_bottom) // 2
 
     stdscr.attron(curses.A_REVERSE)
-    stdscr.addstr(bottom_y, (configs['COLS'] - len("LEGEND")) // 2, "LEGEND")
-    stdscr.addstr(bottom_y + 1, (configs['COLS'] - len(legend)) // 2, legend)
+    bottom_y -= (len(legends) + 1) // 2
+    stdscr.addstr(bottom_y, (configs['COLS'] - len(" LEGEND ")) // 2, " LEGEND ")
+    for legend in legends:
+        bottom_y += 1 
+        legend = legend.center(70)
+        stdscr.addstr(bottom_y, (configs['COLS'] - len(legend)) // 2, legend)
 
     stdscr.addstr(top_y, (configs['COLS'] - len(amazing)) // 2, amazing)
     stdscr.attroff(curses.A_REVERSE)
     
-    refresh_and_sleep(1, stdscr)
+    refresh_and_sleep(0, stdscr)
 
-def generate_maze(configs, maze, stdscr: curses.window, color_pairs):
+def generate_maze(configs: dict, maze, stdscr: curses.window):
+    args: tuple = ( 
+            stdscr,
+            configs['PALETTE'],
+            configs['HORIZONTAL_OFFSET'],
+            configs['VERTICAL_OFFSET'],
+            configs['SEED'],
+            configs['SECONDS']
+                )
     if configs['GEN_ALGORITHM'] == 'prim':
-        maze.prim_algorithm(
-                stdscr,
-                color_pairs[0],
-                configs['HORIZONTAL_OFFSET'],
-                configs['VERTICAL_OFFSET'],
-                configs['SEED']
-                )
+        maze.prim_algorithm(*args)
     else:
-        maze.dfs(
-                stdscr,
-                color_pairs[0],
-                configs['HORIZONTAL_OFFSET'],
-                configs['VERTICAL_OFFSET'],
-                configs['SEED']
-                )
-    refresh_and_sleep(1, stdscr)
+        maze.dfs(*args)
+    refresh_and_sleep(0, stdscr)
 
-def print_matrix(configs, maze, stdscr, color_pairs):
-    def print_step(configs, maze, stdscr: curses.window, color_pairs, print_method):
+def print_matrix(configs: dict, maze, stdscr: curses.window):
+    def print_step(configs: dict, maze, stdscr: curses.window, print_method):
         for row, col in product(range(configs['WIDTH']), range(configs['HEIGHT'])):
             print_method(
                 maze[row][col],
                 stdscr,
-                color_pairs[0],
+                configs['PALETTE'],
                 configs['HORIZONTAL_OFFSET'],
                 configs['VERTICAL_OFFSET'],
                 )
-        refresh_and_sleep(1, stdscr)
+        refresh_and_sleep(0.2, stdscr)
     for print_method in [
             MazeGenerator.Cell.print_base,
             MazeGenerator.Cell.print_self
             ]:
-        print_step(configs, maze, stdscr, color_pairs, print_method)
+        print_step(configs, maze, stdscr, print_method)
+    refresh_and_sleep(0, stdscr)
     
 def maze_stats_to_txt(configs: dict, maze: MazeGenerator):
     with open(configs['OUTPUT_FILE'], 'w') as f:
@@ -72,7 +80,7 @@ def maze_stats_to_txt(configs: dict, maze: MazeGenerator):
             f.write('\n')
 
 
-def inferred_configs(configs, stdscr):
+def extend_configs(configs: dict, stdscr: curses.window):
     n_rows, n_cols = stdscr.getmaxyx()
     horizontal_offset: int = (n_cols - (configs['HEIGHT'] * 4 + 1)) // 2
     vertical_offset: int = (n_rows - (configs['WIDTH'] * 2 + 1)) // 2
@@ -81,64 +89,105 @@ def inferred_configs(configs, stdscr):
     configs['HORIZONTAL_OFFSET'] = horizontal_offset
     configs['VERTICAL_OFFSET'] = vertical_offset
 
-def a_maze_ing(stdscr: curses.window):
-    
-    configs:dict = config_parser()
-    inferred_configs(configs, stdscr)
+def color_generator(color_pairs: list):
+    for color_pair in cycle(color_pairs):
+        yield color_pair 
 
-    color_pairs: list = init_colors()
-    curses.curs_set(0) # nascondi il cursore
-    stdscr.nodelay(True)  # non blocca su getch()
-
-    stdscr.bkgd(' ', color_pairs[0]) # background base
+def generate_and_print_matrix(configs, stdscr) -> Maze:
+    extend_configs(configs, stdscr)
     print_legend(stdscr, configs) 
+    matrix = MazeGenerator(configs['WIDTH'], configs['HEIGHT'])
+    print_matrix(configs, matrix, stdscr) 
+    return matrix
 
-   
-    maze: list[list[MazeGenerator.Cell]] = MazeGenerator(
-            configs['WIDTH'],
-            configs['HEIGHT'],
-            )
- 
-    print_matrix(configs, maze, stdscr, color_pairs) 
-    generate_maze(configs, maze, stdscr, color_pairs)
-    maze_stats_to_txt(configs, maze)
-   
-    refresh_and_sleep(1, stdscr)
-    
-    def color_generator(color_pairs: list):
-        for color_pair in cycle(color_pairs):
-            yield color_pair
-    color_pair: Generator = color_generator(color_pairs) 
-    while True:
-        ch = stdscr.getch() # returna un int
-        if ch == ord('q'): # fai il confronto su un int
-            break
-        elif ch == ord('g'): # maze gen algorithm
-            pass
-        elif ch == ord('c'):
-            color_palette = next(color_pair)
-        elif ch == ord('p'):
-            pass # find path
-            
+def ch_parsing(
+        ch: int,
+        maze: Maze,
+        configs: dict,
+        stdscr,
+        color_pair: Generator
+        ) -> Maze:
+    if ch == ord('h'):
+        configs['WIDTH'] += 1
+        ch = ord('l')
+    elif ch == ord('w'):
+        configs['HEIGHT'] += 1
+        ch = ord('l')
+    elif ch == ord('c'):
+        configs['PALETTE'] = next(color_pair)
+        stdscr.bkgd(' ', configs['PALETTE'])
+    elif ch == ord('p'):
+        pass
+    elif ch == ord('s'):
+        configs['SEED'] += 1
+        maze = generate_and_print_matrix(configs, stdscr)
+        ch = ord('m')
+    elif ch == ord('d'):
+        configs['SECONDS'] += 0.5
+    elif ch == ord('i'):
+        if configs['SECONDS'] > 0:
+            configs['SECONDS'] -= 0.5
+    elif ch == ord('g'):
+        if configs['GEN_ALGORITHM'] == 'prim':
+            configs['GEN_ALGORITHM'] = 'dfs'
+        else:
+            configs['GEN_ALGORITHM'] = 'prim'
+        print_legend(stdscr, configs)
+    elif ch == ord('o'):
+        stdscr.clear()
+    if ch == ord('l'):
+        stdscr.clear()
+        return generate_and_print_matrix(configs, stdscr)
+    elif ch == ord('m'):
+        generate_maze(configs, maze, stdscr)
+        maze_stats_to_txt(configs, maze)
+    return maze
 
-def main():
-    """Main function of the program.
-        Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
-        path from a randomly genereted starting point to a randomly genereted
-        ending point. The all process is animated through curses.
+def a_maze_ing(stdscr: curses.window) -> bool:
+    """Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
+    path from a randomly genereted starting point to a randomly genereted
+    ending point. The all process is animated through curses.
 
-    Args:
+    Parameter:
         stdscr: curses standard screen
     """
-    curses.wrapper(a_maze_ing)
+    configs:dict = config_parser()
+    color_pair: Generator = color_generator(init_colors()) 
+    configs['PALETTE'] = next(color_pair)
+    configs['SECONDS'] = 1
+    curses.curs_set(0) # nascondi il cursore
+    stdscr.nodelay(True)  # non blocca su getch()
+    width, height = (configs['WIDTH'], configs['HEIGHT'])
+    extend_configs(configs, stdscr)
+    stdscr.bkgd(' ', configs['PALETTE'])
+    maze: Maze = generate_and_print_matrix(configs, stdscr)
+    while (ch := stdscr.getch()):
+        if ch == ord('q'):
+            break
+        elif ch == ord('r'):
+            return True
+        maze = ch_parsing(ch, maze, configs, stdscr, color_pair)
+    return False
+
+def main(stdscr: curses.window) -> None:
+    """Loops a_maze_ing for every time the user asks to reload starting configuration.
+
+    Parameter:
+        stdscr: curses standard screen
+    """
+    while a_maze_ing(stdscr):
+        stdscr.clear()
     
 
 if __name__ == "__main__":
     import sys
     try:
-        main()
+        curses.wrapper(main)
     except SystemExit as e: # ArgumentParser
-        print(f'Invalid number of arguments, only one filename required', file=sys.stderr)
+        print(
+            f'Invalid number of arguments, only one filename required',
+            file=sys.stderr
+            )
     except curses.error:
         print(
                 "An error occurred, probably there is "

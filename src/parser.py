@@ -63,8 +63,8 @@ def config_parser():
             upload_key(config, configs, optional_keys)
         if len(config_keys):
             raise ValueError(f'Mandatory keys: {config_keys}')
-    configs['WIDTH'] = int(configs['WIDTH'])
-    configs['HEIGHT'] = int(configs['HEIGHT'])
+    configs['WIDTH'] = int(configs['HEIGHT'])
+    configs['HEIGHT'] = int(configs['WIDTH'])
     configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
     configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
     configs['PERFECT'] = bool(configs['PERFECT'])

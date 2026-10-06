@@ -298,8 +298,8 @@ class MazeGenerator:
     def __valid_closest_cells(self, cell):
         closest_cells = []
         for wall in self.__valid_walls(cell):
-            xy = cell.adjacent_cell(wall.name)
-            cell2 = self[xy[0]][xy[1]]
+            x, y = cell.adjacent_cell(wall.name)
+            cell2 = self[x][y]
             closest_cells.append((cell2, wall))
         return closest_cells
 
@@ -310,13 +310,11 @@ class MazeGenerator:
                 seed_rand: int
                 ):
         seed(seed_rand)
-        cell = self.__random_valid_starting_cell()
-        cell.is_visited = True
-        stack = []
-        stack.append(cell)
+        stack: list = [self.__random_valid_starting_cell()]
+        stack[0].is_visited = True
         while stack:
             current = stack.pop()
-            closest = self.__valid_closest_cells(current)
+            closest: list[tuple] = self.__valid_closest_cells(current)
             if closest:
                 stack.append(current)
                 adjacent, wall = choice(closest)

@@ -319,7 +319,7 @@ class MazeGenerator:
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int,
-                seed_rand: int,
+                seed_rand: int
                 seconds: float
                 ):
         seed(seed_rand)

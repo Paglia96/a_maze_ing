@@ -117,9 +117,10 @@ def ch_parsing(
         configs['PALETTE'] = next(color_pair)
         stdscr.bkgd(' ', configs['PALETTE'])
     elif ch == ord('p'):
-        pass
+        solve_maze_path(configs, maze, stdscr)
     elif ch == ord('s'):
         configs['SEED'] += 1
+        stdscr.clear()
         maze = generate_and_print_matrix(configs, stdscr)
         ch = ord('m')
     elif ch == ord('d'):
@@ -168,6 +169,23 @@ def a_maze_ing(stdscr: curses.window) -> bool:
             return True
         maze = ch_parsing(ch, maze, configs, stdscr, color_pair)
     return False
+
+
+def solve_maze_path(configs: dict, maze, stdscr: curses.window):
+    args: tuple = (
+        stdscr,
+        configs['PALETTE'],
+        configs['HORIZONTAL_OFFSET'],
+        configs['VERTICAL_OFFSET'],
+        configs['SECONDS'],
+        configs
+    )
+
+    if configs['SOLVING_ALGORITHM'] == 'bfs':
+        maze.bfs(*args)
+
+    refresh_and_sleep(0, stdscr)
+
 
 def main(stdscr: curses.window) -> None:
     """Loops a_maze_ing for every time the user asks to reload starting configuration.

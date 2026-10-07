@@ -76,7 +76,7 @@ def config_parser():
         configs['GEN_ALGORITHM'] = 'prim'
     if 'SOLVING_ALGORITHM' in configs:
         value = configs['SOLVING_ALGORITHM'].lower()
-        configs['SOLVING_ALGORITHM'] = value if value in ['prim', 'bfs'] else 'prim'
+        configs['SOLVING_ALGORITHM'] = value if value in ['other', 'bfs'] else 'bfs'
     else:
-        configs['SOLVING_ALGORITHM'] = 'prim'
+        configs['SOLVING_ALGORITHM'] = 'bfs'
     return configs

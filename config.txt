@@ -2,8 +2,8 @@
 
 WIDTH=12 # int
 HEIGHT=12 # int
-ENTRY=0,0 # int, int
-EXIT=11,10 # int, int
+ENTRY=4,2 # int, int
+EXIT=7,1 # int, int
 OUTPUT_FILE=maze.txt # file name
 PERFECT=False # bool
 

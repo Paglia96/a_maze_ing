@@ -176,7 +176,7 @@ class MazeGenerator:
             elif self.end:
                 stdscr.addstr(row + 1, col + 1, '🧀', palette)
             elif self.is_path:
-                stdscr.addstr(row + 1, col + 1, 'o' * 3, palette)
+                stdscr.addstr(row + 1, col + 1, ' o', palette)
 
     
     def __init__(
@@ -361,7 +361,10 @@ class MazeGenerator:
                 seconds: float,
                 configs: dict
                 ) -> None:
-    
+
+        """Finds the shortest path usign breadth first search alghorithm,
+        storing each cell parent and rebuilding the path from exit to entry
+         """
         from collections import deque
         
         # resetta a ogni chiamata
@@ -424,5 +427,4 @@ class MazeGenerator:
 
                 if curr == entry_cell:
                     break
-                # qui devo printare il percorso nella cella
                 curr = curr.parent

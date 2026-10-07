@@ -12,10 +12,10 @@ def print_legend(stdscr: curses.window, configs: dict):
     amazing = " A_MAZE_ING project from ccrucian and gipaglie "
     legends = [
             'l = matrix refresh | q = quit | r = reset',
-            "m = generate maze | "
+            "m = generate maze | d = speed-- | i = speed++",
             f"g = generation algorithm (current: {configs['GEN_ALGORITHM']})",
             "p = pathfinder | "
-            f"p = pathfinder algorithm (current: {configs['GEN_ALGORITHM']})",
+            f"p = pathfinder algorithm (current: {configs['SOLVING_ALGORITHM']})",
             "c = color palette | s = change seed | w = width++ | h = height++",
             ]
 
@@ -45,7 +45,8 @@ def generate_maze(configs: dict, maze, stdscr: curses.window):
             configs['PALETTE'],
             configs['HORIZONTAL_OFFSET'],
             configs['VERTICAL_OFFSET'],
-            configs['SEED']
+            configs['SEED'],
+            configs['SECONDS']
                 )
     if configs['GEN_ALGORITHM'] == 'prim':
         maze.prim_algorithm(*args)
@@ -121,6 +122,11 @@ def ch_parsing(
         configs['SEED'] += 1
         maze = generate_and_print_matrix(configs, stdscr)
         ch = ord('m')
+    elif ch == ord('d'):
+        configs['SECONDS'] += 0.5
+    elif ch == ord('i'):
+        if configs['SECONDS'] > 0:
+            configs['SECONDS'] -= 0.5
     elif ch == ord('g'):
         if configs['GEN_ALGORITHM'] == 'prim':
             configs['GEN_ALGORITHM'] = 'dfs'
@@ -148,6 +154,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     configs:dict = config_parser()
     color_pair: Generator = color_generator(init_colors()) 
     configs['PALETTE'] = next(color_pair)
+    configs['SECONDS'] = 1
     curses.curs_set(0) # nascondi il cursore
     stdscr.nodelay(True)  # non blocca su getch()
     width, height = (configs['WIDTH'], configs['HEIGHT'])

@@ -1,5 +1,5 @@
 # Urgent
-- logo handling when there are too little cells in the maze
+- handling maze generation when there's no logo
 
 # To do at the end of the project:
 - error handling in main

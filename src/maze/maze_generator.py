@@ -264,17 +264,29 @@ class MazeGenerator:
                 valid_walls.append(wall)
         return valid_walls
 
-    def __print_animation(self, current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds):
+    def __print_animation(
+            self,
+            current,
+            adjacent,
+            stdscr,
+            palette,
+            horizontal_offset,
+            vertical_offset,
+            seconds
+            ):
         current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         stdscr.refresh()
         sleep(seconds / (self.height * self.width))
 
-    def prim_algorithm(self, stdscr: c.window,
+    def prim_algorithm(
+                self,
+                stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int,
-                seed_rand: int
+                seed_rand: int,
+                seconds: float
                 ):
         seed(seed_rand)
         cells: list = [self.__random_valid_starting_cell()]
@@ -292,29 +304,30 @@ class MazeGenerator:
             wall2 = wall.opposite_wall()
             current.remove_wall(wall)
             adjacent.remove_wall(wall2)
-            self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds=2)
+            self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds)
 
 
-    def __valid_closest_cells(self, cell):
+    def _valid_closest_cells(self, cell):
         closest_cells = []
         for wall in self.__valid_walls(cell):
             x, y = cell.adjacent_cell(wall.name)
-            cell2 = self[x][y]
-            closest_cells.append((cell2, wall))
+            adjacent = self[x][y]
+            closest_cells.append((adjacent, wall))
         return closest_cells
 
     def dfs(self, stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int,
-                seed_rand: int
+                seed_rand: int,
+                seconds: float
                 ):
         seed(seed_rand)
         stack: list = [self.__random_valid_starting_cell()]
         stack[0].is_visited = True
         while stack:
             current = stack.pop()
-            closest: list[tuple] = self.__valid_closest_cells(current)
+            closest: list[tuple] = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
                 adjacent, wall = choice(closest)
@@ -322,7 +335,4 @@ class MazeGenerator:
                 adjacent.remove_wall(wall.opposite_wall())
                 adjacent.is_visited = True
                 stack.append(adjacent)
-                self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds=5)
-        
-
-
+                self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds)

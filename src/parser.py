@@ -1,32 +1,25 @@
 from argparse import ArgumentParser
 
-def config_parser():
-    """Parse and validate the maze configuration file.
+def values_check(configs: dict):
+    width, height = (configs['WIDTH'], configs['HEIGHT'])
+    configs['WIDTH'] = int(height)
+    configs['HEIGHT'] = int(width)
+    configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
+    configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
+    configs['PERFECT'] = bool(configs['PERFECT'])
+    configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
+    if 'GEN_ALGORITHM' in configs:
+        val = configs['GEN_ALGORITHM'].lower()
+        configs['GEN_ALGORITHM'] = val if val in ['prim', 'dfs'] else 'prim'
+    else:
+        configs['GEN_ALGORITHM'] = 'prim'
+    if 'SOLVING_ALGORITHM' in configs:
+        val = configs['SOLVING_ALGORITHM'].lower()
+        configs['SOLVING_ALGORITHM'] = val if val in ['other', 'bfs'] else 'bfs'
+    else:
+        configs['SOLVING_ALGORITHM'] = 'bfs'
 
-    The configuration file path is read from the command-line arguments.
-    Each non-empty line must contain a single ``KEY=VALUE`` pair.
-    Lines beginning with ``#`` and inline comments are ignored.
-
-    Returns:
-        dict: A dictionary containing the parsed configuration values.
-            ``WIDTH`` and ``HEIGHT`` are integers.
-            ``ENTRY`` and ``EXIT`` are coordinate tuples.
-            ``PERFECT`` is a boolean.
-
-    Raises:
-        SystemExit: if the number of given arguments is different from 1.
-        ValueError: If a configuration line is malformed or a mandatory
-            configuration key is missing.
-        FileNotFoundError: If the specified configuration file does not exist.
-        PermissionError: If the configuration file cannot be opened.
-    """
-    parser = ArgumentParser(
-            description='Receives the maze configuration settings as an argument'
-            )
-    parser.add_argument('filename', help='file path')
-    arg = parser.parse_args()
-    filename = arg.filename
-    configs: dict = {}
+def file_parsing(configs, filename):
     with open(filename, 'r') as f:
         config_keys: list[str] = [
                 'WIDTH',
@@ -63,20 +56,34 @@ def config_parser():
             upload_key(config, configs, optional_keys)
         if len(config_keys):
             raise ValueError(f'Mandatory keys: {config_keys}')
-    configs['WIDTH'] = int(configs['HEIGHT'])
-    configs['HEIGHT'] = int(configs['WIDTH'])
-    configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
-    configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
-    configs['PERFECT'] = bool(configs['PERFECT'])
-    configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
-    if 'GEN_ALGORITHM' in configs:
-        value = configs['GEN_ALGORITHM'].lower()
-        configs['GEN_ALGORITHM'] = value if value in ['prim', 'dfs'] else 'prim'
-    else:
-        configs['GEN_ALGORITHM'] = 'prim'
-    if 'SOLVING_ALGORITHM' in configs:
-        value = configs['SOLVING_ALGORITHM'].lower()
-        configs['SOLVING_ALGORITHM'] = value if value in ['prim', 'bfs'] else 'prim'
-    else:
-        configs['SOLVING_ALGORITHM'] = 'prim'
+
+def config_parser():
+    """Parse and validate the maze configuration file.
+
+    The configuration file path is read from the command-line arguments.
+    Each non-empty line must contain a single ``KEY=VALUE`` pair.
+    Lines beginning with ``#`` and inline comments are ignored.
+
+    Returns:
+        dict: A dictionary containing the parsed configuration values.
+            ``WIDTH`` and ``HEIGHT`` are integers.
+            ``ENTRY`` and ``EXIT`` are coordinate tuples.
+            ``PERFECT`` is a boolean.
+
+    Raises:
+        SystemExit: if the number of given arguments is different from 1.
+        ValueError: If a configuration line is malformed or a mandatory
+            configuration key is missing.
+        FileNotFoundError: If the specified configuration file does not exist.
+        PermissionError: If the configuration file cannot be opened.
+    """
+    parser = ArgumentParser(
+            description='Receives the maze configuration settings as an argument'
+            )
+    parser.add_argument('filename', help='file path')
+    arg = parser.parse_args()
+    filename = arg.filename
+    configs: dict = {}
+    file_parsing(configs, filename)
+    values_check(configs)
     return configs

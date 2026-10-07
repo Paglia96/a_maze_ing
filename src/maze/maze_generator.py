@@ -55,6 +55,7 @@ class MazeGenerator:
             height: total height of the matrix
             walls: instance of the Wall class
         """
+        from typing import ClassVar
         x: int
         y: int
         width: int
@@ -64,9 +65,12 @@ class MazeGenerator:
                 )
         is_visited: bool = False
         ft_logo: bool = False
-
         entry: bool = False
         end: bool = False
+        explored: bool = False
+        is_path: bool = False
+        parent: "MazeGenerator.Cell" = None
+        mouse_tracks: ClassVar[int] = 0
 
         def adjacent_cell(self, wall: str):
             """Based on the cell wall received,
@@ -90,7 +94,7 @@ class MazeGenerator:
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int
-                ):
+                ) -> None:
             """Print only the sides of the cell that will not change
             Args:
                 stdscr: the curses standard screen
@@ -135,7 +139,7 @@ class MazeGenerator:
                 palette: int,
                 horizontal_offset: int,
                 vertical_offset: int,
-                ):
+                ) -> None:
             """Print walls or spaces if there is no walls.
                     It prints:
                         -right and down of the cell;
@@ -167,13 +171,19 @@ class MazeGenerator:
             )
             if self.ft_logo:
                 stdscr.addstr(row + 1, col + 1, 'X' * 3, palette)
+            elif self.entry:
+                stdscr.addch(row + 1, col + 1, '🐭', palette)
+            elif self.end:
+                stdscr.addch(row + 1, col + 1, '🧀', palette)
+            elif self.is_path:
+                type(self).mouse_tracks += 1
+                if type(self).mouse_tracks % 2:
+                    stdscr.addch(row + 1, col + 1, '🐾', palette)
+                else:
+                    stdscr.addch(row + 1, col + 2, '🐾', palette)
 
     
-    def __init__(
-            self,
-            width: int,
-            height: int
-            ):
+    def __init__(self, configs: dict):
         """
         Initialize a maze generator instance
 
@@ -189,35 +199,33 @@ class MazeGenerator:
         Logo width x height 7 x 4
         
         """
-        self.__horizontal_offset: int = (width - 5) // 2
-        self.__vertical_offset: int = (height - 7) // 2
-        
-        self.ft_logo = [
+        self.conf = configs
+        self.ft_logo = (
             [0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2],
             [0, 4], [0, 5], [0, 6], [1, 6], [2, 4], [2, 5],
             [2, 6], [3, 4], [4, 4], [4, 5], [4, 6]
-        ]
-
+            )
         for cell in self.ft_logo:
-            cell[0] += self.__horizontal_offset
-            cell[1] += self.__vertical_offset
+            cell[0] += (horizontal_offset := (configs['WIDTH'] - 5) // 2)
+            cell[1] += (vertical_offset := (configs['HEIGHT'] - 7) // 2)
 
         self.maze: list[list[MazeGenerator.Cell]] = []
-
-        for x in range(width):
+        for x in range(configs['WIDTH']):
             rows: list[MazeGenerator.Cell] = []
-            for y in range(height):
+            for y in range(configs['HEIGHT']):
                 for ft_x, ft_y in self.ft_logo:
                     if ft_x == x and ft_y == y:
-                        rows.append(self.Cell(x, y, width, height, ft_logo=True))
+                        rows.append(self.Cell(
+                            x, y, configs['WIDTH'], configs['HEIGHT'],
+                            ft_logo=True
+                            ))
                         break
                 else:
-                    rows.append(self.Cell(x, y, width, height, ft_logo=False))
+                    rows.append(self.Cell(
+                        x, y, configs['WIDTH'], configs['HEIGHT'],
+                        ft_logo=False
+                        ))
             self.maze.append(rows)
-
-
-        self.width = width
-        self.height = height
 
         
     def __getitem__(self, index):
@@ -233,9 +241,9 @@ class MazeGenerator:
     
     def __random_valid_starting_cell(self):
         while (cell := self[
-            randint(0, self.width - 1)
+            randint(0, self.conf['WIDTH'] - 1)
         ][
-            randint(0, self.height - 1)
+            randint(0, self.conf['HEIGHT'] - 1)
         ]).ft_logo:
             pass
         return cell
@@ -250,12 +258,12 @@ class MazeGenerator:
         valid_walls = []
         for wall in walls:
             if cell.x == 0:
-                if wall.name == 'UP' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
+                if wall.name == 'UP' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1 and wall.name == 'RIGHT'):
                     continue
-            if cell.x == self.width - 1:
-                if wall.name == 'DOWN' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.height - 1) and wall.name == 'RIGHT':
+            if cell.x == self.conf['WIDTH'] - 1:
+                if wall.name == 'DOWN' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1) and wall.name == 'RIGHT':
                     continue
-            if (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
+            if (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1 and wall.name == 'RIGHT'):
                 continue
             cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
             if cell2.ft_logo is True:
@@ -277,7 +285,7 @@ class MazeGenerator:
         current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         stdscr.refresh()
-        sleep(seconds / (self.height * self.width))
+        sleep(seconds / (self.conf['HEIGHT'] * self.conf['WIDTH']))
 
     def prim_algorithm(
                 self,
@@ -298,13 +306,21 @@ class MazeGenerator:
             except IndexError: # choice riceve lista vuota
                 cells.remove(current)
                 continue
-            adjacent = self[(i := current.adjacent_cell(wall.name))[0]][i[1]]
+            adjacent = self[(xy := current.adjacent_cell(wall.name))[0]][xy[1]]
             adjacent.is_visited = True
             cells.append(adjacent)
             wall2 = wall.opposite_wall()
             current.remove_wall(wall)
             adjacent.remove_wall(wall2)
-            self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds)
+            self.__print_animation(
+                    current,
+                    adjacent,
+                    stdscr,
+                    palette,
+                    horizontal_offset,
+                    vertical_offset,
+                    seconds
+                    )
 
 
     def _valid_closest_cells(self, cell):
@@ -335,4 +351,83 @@ class MazeGenerator:
                 adjacent.remove_wall(wall.opposite_wall())
                 adjacent.is_visited = True
                 stack.append(adjacent)
-                self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds)
+                self.__print_animation(
+                        current,
+                        adjacent,
+                        stdscr,
+                        palette,
+                        horizontal_offset,
+                        vertical_offset,
+                        seconds
+                        )
+
+    def cell_coordinates_given(self, config_cell: tuple):
+        cell = self[config_cell[0]][config_cell[1]]
+        return cell
+
+    def bfs(self, stdscr: c.window) -> None:
+
+        """Finds the shortest path usign breadth first search alghorithm,
+        storing each cell parent and rebuilding the path from exit to entry
+         """
+        from collections import deque        
+        # resetta a ogni chiamata
+        for row in self.maze:
+            for cell in row:
+                cell.explored = False
+                cell.parent = None
+                cell.is_path = False
+                cell.entry = False
+                cell.end = False
+
+        entry_cell = self.cell_coordinates_given(self.conf['ENTRY'])
+        #if entry not in logo
+        entry_cell.entry = True
+        exit_cell = self.cell_coordinates_given(self.conf['EXIT'])
+        # If exit cell not in logo to add
+        exit_cell.end = True
+
+        for row in self.maze:
+            for cell in row:
+                cell.print_self(
+                    stdscr,
+                    self.conf['PALETTE'],
+                    self.conf['HORIZONTAL_OFFSET'],
+                    self.conf['VERTICAL_OFFSET']
+                )
+        stdscr.refresh()
+
+        exploring = deque([entry_cell])
+        entry_cell.explored = True
+        found_exit = False
+        while exploring and not found_exit:
+            current = exploring.popleft()
+            if current == exit_cell:
+                found_exit = True
+                break
+
+            for wall in self.Wall:
+                if not (current.walls & wall):
+                    x, y = current.adjacent_cell(wall.name)
+                    adjacent = self[x][y]
+                    if not adjacent.explored:
+                        adjacent.explored = True
+                        adjacent.parent = current
+                        exploring.append(adjacent)
+
+        if found_exit:
+            curr = exit_cell
+            while curr:
+                curr.is_path = True
+                curr.print_self(
+                    stdscr,
+                    self.conf['PALETTE'],
+                    self.conf['HORIZONTAL_OFFSET'],
+                    self.conf['VERTICAL_OFFSET']
+                )
+                stdscr.refresh()
+                sleep(self.conf['SECONDS'] / (self.conf['WIDTH'] * self.conf['HEIGHT']))
+
+                if curr == entry_cell:
+                    break
+                curr = curr.parent

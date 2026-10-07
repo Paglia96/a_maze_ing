@@ -1,9 +1,9 @@
 # Required
 
-WIDTH=10 # int
-HEIGHT=10 # int
-ENTRY=0,0 # int, int
-EXIT=19,14 # int, int
+WIDTH=20 # int
+HEIGHT=14 # int
+ENTRY=10,18 # int, int
+EXIT=5,1 # int, int
 OUTPUT_FILE=maze.txt # file name
 PERFECT=False # bool
 
@@ -11,5 +11,4 @@ PERFECT=False # bool
 
 SEED=10 # int
 GEN_ALGORITHM=prim # dfs | prim
-SOLVING_ALGORITHM=to_add
-
+SOLVING_ALGORITHM=bfs # bfs

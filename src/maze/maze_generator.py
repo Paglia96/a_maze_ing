@@ -68,6 +68,10 @@ class MazeGenerator:
         entry: bool = False
         end: bool = False
 
+        explored: bool = False
+        is_path: bool = False
+        parent: "MazeGenerator.Cell" = None
+
         def adjacent_cell(self, wall: str):
             """Based on the cell wall received,
             returns the coordinates of the adjacent cell"""
@@ -167,6 +171,12 @@ class MazeGenerator:
             )
             if self.ft_logo:
                 stdscr.addstr(row + 1, col + 1, 'X' * 3, palette)
+            elif self.entry:
+                stdscr.addstr(row + 1, col + 1, '🐭', palette)
+            elif self.end:
+                stdscr.addstr(row + 1, col + 1, '🧀', palette)
+            elif self.is_path:
+                stdscr.addstr(row + 1, col + 1, 'o' * 3, palette)
 
     
     def __init__(
@@ -338,6 +348,81 @@ class MazeGenerator:
                 adjacent.is_visited = True
                 stack.append(adjacent)
                 self.__print_animation(current, adjacent, stdscr, palette, horizontal_offset, vertical_offset, seconds)
+
+
+    def cell_coordinates_given(self, config_cell: tuple):
+        cell = self[config_cell[0]][config_cell[1]]
+        return cell
+
+    def bfs(self, stdscr: c.window,
+                palette: int,
+                horizontal_offset: int,
+                vertical_offset: int,
+                seconds: float,
+                configs: dict
+                ) -> None:
+    
+        from collections import deque
         
+        # resetta a ogni chiamata
+        for row in self.maze:
+            for cell in row:
+                cell.explored = False
+                cell.parent = None
+                cell.is_path = False
+                cell.entry = False
+                cell.end = False
 
+        entry_cell = self.cell_coordinates_given(configs['ENTRY'])
+        #if entry not in logo
+        entry_cell.entry = True
+        exit_cell = self.cell_coordinates_given(configs['EXIT'])
+        # If exit cell not in logo to add
+        exit_cell.end = True
 
+        for row in self.maze:
+            for cell in row:
+                cell.print_self(
+                    stdscr,
+                    palette,
+                    horizontal_offset,
+                    vertical_offset
+                )
+        stdscr.refresh()
+
+        exploring = deque([entry_cell])
+        entry_cell.explored = True
+        found_exit = False
+        while exploring and not found_exit:
+            current = exploring.popleft()
+            if current == exit_cell:
+                found_exit = True
+                break
+
+            for wall in self.Wall:
+                if not (current.walls & wall):
+                    xy = current.adjacent_cell(wall.name)
+                    adjacent = self[xy[0]][xy[1]]
+                    if not adjacent.explored:
+                        adjacent.explored = True
+                        adjacent.parent = current
+                        exploring.append(adjacent)
+
+        if found_exit:
+            curr = exit_cell
+            while curr:
+                curr.is_path = True
+
+                curr.print_self(
+                    stdscr,
+                    palette,
+                    horizontal_offset,
+                    vertical_offset
+                )
+                stdscr.refresh()
+                sleep(seconds / (self.width * self.height))
+
+                if curr == entry_cell:
+                    break
+                # qui devo printare il percorso nella cella
+                curr = curr.parent

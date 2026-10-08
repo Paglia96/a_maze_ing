@@ -1,7 +1,7 @@
 # Urgent
 - handling maze generation when there's no space for the logo
 - print to file solving algorithm sequence and test the result with moulinette
-- imperfect algorithm
+- imperfect algorithm --> control 3x3area
 - Entry e Exit possono essere la stessa cella?
 
 # To do at the end of the project:

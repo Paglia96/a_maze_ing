@@ -214,7 +214,9 @@ class MazeGenerator:
             rows: list[MazeGenerator.Cell] = []
             for y in range(configs['HEIGHT']):
                 for ft_x, ft_y in self.ft_logo:
-                    if ft_x == x and ft_y == y:
+                    if (ft_x == x and ft_y == y
+                        and configs["WIDTH"] >= 5 and
+                            configs["HEIGHT"] >= 7):
                         rows.append(self.Cell(
                             x, y, configs['WIDTH'], configs['HEIGHT'],
                             ft_logo=True

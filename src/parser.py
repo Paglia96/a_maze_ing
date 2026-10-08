@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
+from typing import Any
 
-def values_check(configs: dict):
+def values_check(configs: dict) -> None:
     width, height = (configs['WIDTH'], configs['HEIGHT'])
     configs['WIDTH'] = int(height)
     configs['HEIGHT'] = int(width)

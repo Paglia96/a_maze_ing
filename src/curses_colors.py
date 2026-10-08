@@ -1,6 +1,6 @@
 import curses
 
-def init_colors():
+def init_colors() -> None:
     curses.start_color()
     colors = [
             (curses.COLOR_RED, curses.COLOR_BLACK),

@@ -1,32 +1,45 @@
 from argparse import ArgumentParser
-from typing import Any
+from typing import cast
 
-def values_check(configs: dict) -> None:
+
+ConfigValue = str | int | bool | tuple[int, int]
+Configs = dict[str, ConfigValue]
+
+
+def values_check(configs: Configs) -> None:
     width, height = (configs['WIDTH'], configs['HEIGHT'])
-    configs['WIDTH'] = int(height)
-    configs['HEIGHT'] = int(width)
-    configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
-    configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
-    val = configs['PERFECT'].lower()
+    configs['WIDTH'] = int(cast(str, height))
+    configs['HEIGHT'] = int(cast(str, width))
+    configs['ENTRY'] = (
+        int((v := cast(str, configs['ENTRY']).split(','))[0]),
+            int(v[1])
+    )
+    configs['EXIT'] = (
+        int((v := cast(str, configs['EXIT']).split(','))[0]),
+            int(v[1])
+    )
+    val = cast(str, configs['PERFECT']).lower()
     if val == "true":
         configs['PERFECT'] = True
     elif val == "false":
         configs['PERFECT'] = False
     else:
         raise ValueError("PERFECT must be true or false")
-    configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
+    configs['SEED'] = (
+        int(cast(str, configs['SEED'])) if 'SEED' in configs else 1
+        )
     if 'GEN_ALGORITHM' in configs:
-        val = configs['GEN_ALGORITHM'].lower()
+        val = cast(str, configs['GEN_ALGORITHM']).lower()
         configs['GEN_ALGORITHM'] = val if val in ['prim', 'dfs'] else 'prim'
     else:
         configs['GEN_ALGORITHM'] = 'prim'
     if 'SOLVING_ALGORITHM' in configs:
-        val = configs['SOLVING_ALGORITHM'].lower()
+        val = cast(str, configs['SOLVING_ALGORITHM']).lower()
         configs['SOLVING_ALGORITHM'] = val if val in ['other', 'bfs'] else 'bfs'
     else:
         configs['SOLVING_ALGORITHM'] = 'bfs'
 
-def file_parsing(configs, filename):
+def file_parsing(configs: Configs, filename: str) -> None:
     with open(filename, 'r') as f:
         config_keys: list[str] = [
                 'WIDTH',
@@ -53,7 +66,11 @@ def file_parsing(configs, filename):
                         )
             config[0] = config[0].strip()
             config[1] = config[1][:-1].strip()  # remove ending \n e spaces
-            def upload_key(config, configs, keys_list):
+            def upload_key(
+                    config: list[str],
+                    configs: Configs,
+                    keys_list: list[str]
+                    ) -> None:
                 if (key := config[0].upper()) in keys_list:
                     keys_list.remove(key)
                     if key in configs:
@@ -64,7 +81,7 @@ def file_parsing(configs, filename):
         if len(config_keys):
             raise ValueError(f'Mandatory keys: {config_keys}')
 
-def config_parser():
+def config_parser() -> Configs:
     """Parse and validate the maze configuration file.
 
     The configuration file path is read from the command-line arguments.
@@ -90,7 +107,7 @@ def config_parser():
     parser.add_argument('filename', help='file path')
     arg = parser.parse_args()
     filename = arg.filename
-    configs: dict = {}
+    configs: Configs = {}
     file_parsing(configs, filename)
     values_check(configs)
     return configs

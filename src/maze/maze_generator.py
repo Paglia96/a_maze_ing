@@ -301,7 +301,9 @@ class MazeGenerator:
                 cell.y == 0 and wall.name == 'LEFT'
                 ) or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
                 continue
-            cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
+            cell2 = self[
+                (i := cell.adjacent_cell(cast(str, wall.name)))[0]
+                 ][i[1]]
             if cell2.ft_logo is True:
                 continue
             if not cell2.is_visited:
@@ -346,7 +348,9 @@ class MazeGenerator:
             except IndexError: # choice riceve lista vuota
                 cells.remove(current)
                 continue
-            adjacent = self[(xy := current.adjacent_cell(wall.name))[0]][xy[1]]
+            adjacent = self[
+                (xy := current.adjacent_cell(cast(str, wall.name)))[0]
+                ][xy[1]]
             adjacent.is_visited = True
             cells.append(adjacent)
             wall2 = wall.opposite_wall()
@@ -366,11 +370,11 @@ class MazeGenerator:
     def _valid_closest_cells(
             self, cell: "MazeGenerator.Cell"
             ) -> list[tuple[
-                "MazeGenerator.Cell", "MazeGenerator.Cell"
+                "MazeGenerator.Cell", "MazeGenerator.Wall"
                 ]]:
         closest_cells = []
         for wall in self.__valid_walls(cell):
-            x, y = cell.adjacent_cell(wall.name)
+            x, y = cell.adjacent_cell(cast(str, wall.name))
             adjacent = self[x][y]
             closest_cells.append((adjacent, wall))
         return closest_cells
@@ -391,7 +395,7 @@ class MazeGenerator:
         while stack:
             current = stack.pop()
             closest: list[
-                tuple["MazeGenerator.Wall", "MazeGenerator.Cell"]
+                tuple["MazeGenerator.Cell", "MazeGenerator.Wall"]
                 ] = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
@@ -434,7 +438,7 @@ class MazeGenerator:
         for wall in self.Wall:
             if not (cell.walls & wall):
                 continue
-            xy = cell.adjacent_cell(wall.name)
+            xy = cell.adjacent_cell(cast(str, wall.name))
             if not(
                 0 <= xy[0] < self.width
                 and 0 <= xy[1] < self.height
@@ -518,16 +522,19 @@ class MazeGenerator:
                 cell.is_path = False
                 cell.entry = False
                 cell.end = False
+        
+        palette = cast(int, self.conf['PALETTE'])
+        horizontal_offset = cast(int, self.conf['HORIZONTAL_OFFSET'])
+        vertical_offset = cast(int, self.conf['VERTICAL_OFFSET'])
+        seconds = cast(float, self.conf['SECONDS'])
 
         entry_cell = self.coordinates_to_cell(self.entry, 'Entry')
         exit_cell = self.coordinates_to_cell(self.exit, 'Exit')
         for row in self.maze:
             for cell in row:
                 cell.print_self(
-                    stdscr,
-                    self.conf['PALETTE'],
-                    self.conf['HORIZONTAL_OFFSET'],
-                    self.conf['VERTICAL_OFFSET']
+                    stdscr, palette, horizontal_offset,
+                    vertical_offset
                 )
         stdscr.refresh()
 
@@ -542,7 +549,7 @@ class MazeGenerator:
 
             for wall in self.Wall:
                 if not (current.walls & wall):
-                    x, y = current.adjacent_cell(wall.name)
+                    x, y = current.adjacent_cell(cast(str, wall.name))
                     adjacent = self[x][y]
                     if not adjacent.explored:
                         adjacent.explored = True
@@ -550,17 +557,15 @@ class MazeGenerator:
                         exploring.append(adjacent)
 
         if found_exit:
-            curr = exit_cell
+            curr: "MazeGenerator.Cell" | None = exit_cell
             while curr:
                 curr.is_path = True
                 curr.print_self(
-                    stdscr,
-                    self.conf['PALETTE'],
-                    self.conf['HORIZONTAL_OFFSET'],
-                    self.conf['VERTICAL_OFFSET']
+                    stdscr, palette,
+                    horizontal_offset, vertical_offset
                 )
                 stdscr.refresh()
-                sleep(self.conf['SECONDS'] / (self.width * self.height))
+                sleep(seconds / (self.width * self.height))
 
                 if curr == entry_cell:
                     break

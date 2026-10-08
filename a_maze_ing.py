@@ -95,8 +95,8 @@ def color_generator(color_pairs: list):
 
 def generate_and_print_matrix(configs, stdscr) -> Maze:
     extend_configs(configs, stdscr)
-    print_legend(stdscr, configs) 
     matrix = MazeGenerator(configs)
+    print_legend(stdscr, configs) 
     print_matrix(configs, matrix, stdscr) 
     return matrix
 
@@ -207,6 +207,8 @@ if __name__ == "__main__":
                 file=sys.stderr
                 )
         sys.exit(1)
+    except IndexError:
+        print("Entry and exit must be inside the maze", file=sys.stderr)
     except Exception as e:
         print(e, file=sys.stderr)
         import traceback # da usare solo in development

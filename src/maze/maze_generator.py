@@ -226,6 +226,12 @@ class MazeGenerator:
                         ft_logo=False
                         ))
             self.maze.append(rows)
+        for x, y in (configs['ENTRY'], configs['EXIT']):
+            if self.maze[x][y].ft_logo:
+                raise ValueError(
+                        "Entry and exit can't be inside the maze logo\n"
+                        "Please, choose other values for them"
+                        )
 
         
     def __getitem__(self, index):
@@ -361,8 +367,10 @@ class MazeGenerator:
                         seconds
                         )
 
-    def cell_coordinates_given(self, config_cell: tuple):
+    def coordinates_to_cell(self, config_cell: tuple, node_type: str):
         cell = self[config_cell[0]][config_cell[1]]
+        cell.entry = node_type == "Entry"
+        cell.end = node_type == "Exit"
         return cell
 
     def bfs(self, stdscr: c.window) -> None:
@@ -380,13 +388,8 @@ class MazeGenerator:
                 cell.entry = False
                 cell.end = False
 
-        entry_cell = self.cell_coordinates_given(self.conf['ENTRY'])
-        #if entry not in logo
-        entry_cell.entry = True
-        exit_cell = self.cell_coordinates_given(self.conf['EXIT'])
-        # If exit cell not in logo to add
-        exit_cell.end = True
-
+        entry_cell = self.coordinates_to_cell(self.conf['ENTRY'], 'Entry')
+        exit_cell = self.coordinates_to_cell(self.conf['EXIT'], 'Exit')
         for row in self.maze:
             for cell in row:
                 cell.print_self(

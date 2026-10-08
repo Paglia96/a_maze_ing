@@ -5,7 +5,7 @@ HEIGHT=12 # int
 ENTRY=0,0 # int, int
 EXIT=11,10 # int, int
 OUTPUT_FILE=maze.txt # file name
-PERFECT=False # bool
+PERFECT=TRUE # bool
 
 # Optional
 

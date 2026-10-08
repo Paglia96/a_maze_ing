@@ -6,7 +6,13 @@ def values_check(configs: dict):
     configs['HEIGHT'] = int(width)
     configs['ENTRY'] = (int((v := configs['ENTRY'].split(','))[0]), int(v[1]))
     configs['EXIT'] = (int((v := configs['EXIT'].split(','))[0]), int(v[1]))
-    configs['PERFECT'] = bool(configs['PERFECT'])
+    val = configs['PERFECT'].lower()
+    if val == "true":
+        configs['PERFECT'] = True
+    elif val == "false":
+        configs['PERFECT'] = False
+    else:
+        raise ValueError("PERFECT must be true or false")
     configs['SEED'] = int(configs['SEED']) if 'SEED' in configs else 1
     if 'GEN_ALGORITHM' in configs:
         val = configs['GEN_ALGORITHM'].lower()

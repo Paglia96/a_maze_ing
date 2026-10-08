@@ -51,6 +51,14 @@ def generate_maze(configs: dict, maze, stdscr: curses.window):
         maze.prim_algorithm(*args)
     else:
         maze.dfs(*args)
+    if not configs['PERFECT']:
+        maze.remove_dead_ends(
+            stdscr,
+            configs['PALETTE'],
+            configs['HORIZONTAL_OFFSET'],
+            configs['VERTICAL_OFFSET'],
+            configs['SECONDS']
+            )
     refresh_and_sleep(0, stdscr)
 
 def print_matrix(configs: dict, maze, stdscr: curses.window):

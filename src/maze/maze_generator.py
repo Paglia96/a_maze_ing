@@ -337,6 +337,7 @@ class MazeGenerator:
             closest_cells.append((adjacent, wall))
         return closest_cells
 
+
     def dfs(self, stdscr: c.window,
                 palette: int,
                 horizontal_offset: int,
@@ -366,6 +367,90 @@ class MazeGenerator:
                         vertical_offset,
                         seconds
                         )
+
+
+    def open_walls(self, cell) -> int:
+        "Counts the open walls of a cell"
+        "if has only one wall open is a dead end"
+        count = 0
+        for wall in self.Wall:
+            if not (cell.walls & wall):
+                count += 1
+        return count
+
+
+    def closed_valid_walls(self, cell) -> list[tuple[
+            "MazeGenerator.Wall", "MazeGenerator.Cell"
+            ]]:
+        "same of valid walls but controls"
+        "only if the wall is breakable (no border no logo)"
+
+        breakable_walls = []
+
+        for wall in self.Wall:
+            if not (cell.walls & wall):
+                continue
+            xy = cell.adjacent_cell(wall.name)
+            if not(
+                0 <= xy[0] < self.conf["WIDTH"]
+                and 0 <= xy[1] < self.conf["HEIGHT"]
+            ):
+                continue
+            adjacent = self[xy[0]][xy[1]]
+            if adjacent.ft_logo:
+                continue
+            breakable_walls.append((wall, adjacent))
+
+        return breakable_walls
+
+    def remove_dead_ends(
+            self,
+            stdscr:c.window,
+            palette: int,
+            horizontal_offset: int,
+            vertical_offset: int,
+            seconds: int
+            ) -> None:
+
+        while True:
+            dead_ends = []
+
+            for row in self.maze:
+                for cell in row:
+                    if cell.ft_logo:
+                        continue
+                    if self.open_walls(cell) == 1:
+                        dead_ends.append(cell)
+            if not dead_ends:
+                break
+
+            changed = False
+
+            for cell in dead_ends:
+                if self.open_walls(cell) != 1:
+                    continue
+                breakable_walls = self.closed_valid_walls(cell)
+                if not breakable_walls:
+                    continue
+                wall, adjacent = choice(breakable_walls)
+                cell.remove_wall(wall)
+                adjacent.remove_wall(wall.opposite_wall())
+                self.__print_animation(
+                                cell,
+                                adjacent,
+                                stdscr,
+                                palette,
+                                horizontal_offset,
+                                vertical_offset,
+                                seconds
+                                )
+
+                changed = True
+
+            if not changed:
+                break
+
+
 
     def coordinates_to_cell(self, config_cell: tuple, node_type: str):
         cell = self[config_cell[0]][config_cell[1]]

@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from typing import cast
 
 
-ConfigValue = str | int | bool | tuple[int, int]
+ConfigValue = str | int | bool | tuple[int, int] | float
 Configs = dict[str, ConfigValue]
 
 

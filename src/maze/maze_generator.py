@@ -458,7 +458,7 @@ class MazeGenerator:
             palette: int,
             horizontal_offset: int,
             vertical_offset: int,
-            seconds: int
+            seconds: float
             ) -> None:
 
         while True:

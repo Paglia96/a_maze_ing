@@ -3,9 +3,11 @@ from time import sleep
 from enum import IntFlag
 from dataclasses import dataclass, field
 from itertools import product
-from typing import Callable
+from typing import Callable, ClassVar
 from random import seed, choice, randint
-from typing import Any
+from ..parser import Configs
+from typing import cast
+
 
 class MazeGenerator:
     """Represents the Maze and offers tools to work with it.
@@ -34,17 +36,21 @@ class MazeGenerator:
         DOWN = 4 # 0100
         LEFT = 8 # 1000
 
+
         def opposite_wall(self) -> "MazeGenerator.Wall":
             """Receives a single wall and returns its reversed value"""
-            if self == type(self).UP:
-                return type(self).DOWN
-            if self == type(self).DOWN:
-                return type(self).UP
-            if self == type(self).LEFT:
-                return type(self).RIGHT
-            if self == type(self).RIGHT:
-                return type(self).LEFT
-            
+            if self == MazeGenerator.Wall.UP:
+                return MazeGenerator.Wall.DOWN
+            if self == MazeGenerator.Wall.DOWN:
+                return MazeGenerator.Wall.UP
+            if self == MazeGenerator.Wall.LEFT:
+                return MazeGenerator.Wall.RIGHT
+            if self == MazeGenerator.Wall.RIGHT:
+                return MazeGenerator.Wall.LEFT
+
+            raise ValueError(f"Invalid wall: {self}")
+
+
     @dataclass
     class Cell:
         """Represent a cell of the maze.
@@ -56,7 +62,6 @@ class MazeGenerator:
             height: total height of the matrix
             walls: instance of the Wall class
         """
-        from typing import ClassVar
         x: int
         y: int
         width: int
@@ -70,11 +75,11 @@ class MazeGenerator:
         end: bool = False
         explored: bool = False
         is_path: bool = False
-        parent: "MazeGenerator.Cell" = None
+        parent: "MazeGenerator.Cell | None" = None
         mouse_tracks: ClassVar[int] = 0
 
         def adjacent_cell(self, wall: str) -> tuple[
-                                int, int] | None:
+                                int, int]:
             """Based on the cell wall received,
             returns the coordinates of the adjacent cell"""
             match wall:
@@ -86,7 +91,9 @@ class MazeGenerator:
                     return (self.x, self.y + 1)
                 case 'DOWN':
                     return (self.x + 1, self.y)
-        
+            raise ValueError(f"Invalid wall: {wall}")
+
+
         def remove_wall(self, wall: "MazeGenerator.Wall") -> None:
             self.walls &= ~wall
 
@@ -185,7 +192,7 @@ class MazeGenerator:
                     stdscr.addch(row + 1, col + 2, '🐾', palette)
 
     
-    def __init__(self, configs: dict[str, Any]) -> None:
+    def __init__(self, configs: Configs) -> None:
         """
         Initialize a maze generator instance
 
@@ -202,35 +209,43 @@ class MazeGenerator:
         
         """
         self.conf = configs
+        self.width = cast(int, configs['WIDTH'])
+        self.height = cast(int, configs['HEIGHT'])
+        self.entry = cast(tuple[int, int], configs['ENTRY'])
+        self.exit = cast(tuple[int, int], configs['EXIT'])
         self.ft_logo = (
             [0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2],
             [0, 4], [0, 5], [0, 6], [1, 6], [2, 4], [2, 5],
             [2, 6], [3, 4], [4, 4], [4, 5], [4, 6]
             )
         for cell in self.ft_logo:
-            cell[0] += (horizontal_offset := (configs['WIDTH'] - 5) // 2)
-            cell[1] += (vertical_offset := (configs['HEIGHT'] - 7) // 2)
+            cell[0] += (
+                horizontal_offset := (self.width - 5) // 2
+            )
+            cell[1] += (
+                vertical_offset := (self.height - 7) // 2
+                )
 
         self.maze: list[list[MazeGenerator.Cell]] = []
-        for x in range(configs['WIDTH']):
+        for x in range(self.width):
             rows: list[MazeGenerator.Cell] = []
-            for y in range(configs['HEIGHT']):
+            for y in range(self.height):
                 for ft_x, ft_y in self.ft_logo:
                     if (ft_x == x and ft_y == y
-                        and configs["WIDTH"] >= 5 and
-                            configs["HEIGHT"] >= 7):
+                        and self.width >= 5 and
+                            self.height >= 7):
                         rows.append(self.Cell(
-                            x, y, configs['WIDTH'], configs['HEIGHT'],
+                            x, y, self.width, self.height,
                             ft_logo=True
                             ))
                         break
                 else:
                     rows.append(self.Cell(
-                        x, y, configs['WIDTH'], configs['HEIGHT'],
+                        x, y, self.width, self.height,
                         ft_logo=False
                         ))
             self.maze.append(rows)
-        for x, y in (configs['ENTRY'], configs['EXIT']):
+        for x, y in (self.entry, self.exit):
             if self.maze[x][y].ft_logo:
                 raise ValueError(
                         "Entry and exit can't be inside the maze logo\n"
@@ -253,9 +268,9 @@ class MazeGenerator:
     
     def __random_valid_starting_cell(self) -> "MazeGenerator.Cell":
         while (cell := self[
-            randint(0, self.conf['WIDTH'] - 1)
+            randint(0, self.width - 1)
         ][
-            randint(0, self.conf['HEIGHT'] - 1)
+            randint(0, self.height - 1)
         ]).ft_logo:
             pass
         return cell
@@ -269,16 +284,22 @@ class MazeGenerator:
         -the adjacent cell is still not visited
         -the wall is breakable (not an edge of the maze, not part of the 42 logo)
         """
-        walls = [wall for wall in cell.walls]
+        walls = [wall for wall in self.Wall if cell.walls & wall]
         valid_walls = []
         for wall in walls:
             if cell.x == 0:
-                if wall.name == 'UP' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1 and wall.name == 'RIGHT'):
+                if wall.name == 'UP' or (
+                    cell.y == 0 and wall.name == 'LEFT'
+                    ) or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
                     continue
-            if cell.x == self.conf['WIDTH'] - 1:
-                if wall.name == 'DOWN' or (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1) and wall.name == 'RIGHT':
+            if cell.x == self.width - 1:
+                if wall.name == 'DOWN' or (
+                    cell.y == 0 and wall.name == 'LEFT'
+                    ) or (cell.y == self.height - 1) and wall.name == 'RIGHT':
                     continue
-            if (cell.y == 0 and wall.name == 'LEFT') or (cell.y == self.conf['HEIGHT'] - 1 and wall.name == 'RIGHT'):
+            if (
+                cell.y == 0 and wall.name == 'LEFT'
+                ) or (cell.y == self.height - 1 and wall.name == 'RIGHT'):
                 continue
             cell2 = self[(i := cell.adjacent_cell(wall.name))[0]][i[1]]
             if cell2.ft_logo is True:
@@ -301,7 +322,8 @@ class MazeGenerator:
         current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         stdscr.refresh()
-        sleep(seconds / (self.conf['HEIGHT'] * self.conf['WIDTH']))
+        sleep(seconds / (self.height * self.width))
+
 
     def prim_algorithm(
                 self,
@@ -343,7 +365,9 @@ class MazeGenerator:
 
     def _valid_closest_cells(
             self, cell: "MazeGenerator.Cell"
-            ) -> list["MazeGenerator.Cell"]:
+            ) -> list[tuple[
+                "MazeGenerator.Cell", "MazeGenerator.Cell"
+                ]]:
         closest_cells = []
         for wall in self.__valid_walls(cell):
             x, y = cell.adjacent_cell(wall.name)
@@ -360,11 +384,15 @@ class MazeGenerator:
                 seconds: float
                 ) -> None:
         seed(seed_rand)
-        stack: list = [self.__random_valid_starting_cell()]
+        stack: list[
+                "MazeGenerator.Cell"
+            ] = [self.__random_valid_starting_cell()]
         stack[0].is_visited = True
         while stack:
             current = stack.pop()
-            closest: list[tuple] = self._valid_closest_cells(current)
+            closest: list[
+                tuple["MazeGenerator.Wall", "MazeGenerator.Cell"]
+                ] = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
                 adjacent, wall = choice(closest)
@@ -408,8 +436,8 @@ class MazeGenerator:
                 continue
             xy = cell.adjacent_cell(wall.name)
             if not(
-                0 <= xy[0] < self.conf["WIDTH"]
-                and 0 <= xy[1] < self.conf["HEIGHT"]
+                0 <= xy[0] < self.width
+                and 0 <= xy[1] < self.height
             ):
                 continue
             adjacent = self[xy[0]][xy[1]]
@@ -468,7 +496,6 @@ class MazeGenerator:
                 break
 
 
-
     def coordinates_to_cell(
             self, config_cell: tuple[int, int], node_type: str
             ) -> "MazeGenerator.Cell":
@@ -492,8 +519,8 @@ class MazeGenerator:
                 cell.entry = False
                 cell.end = False
 
-        entry_cell = self.coordinates_to_cell(self.conf['ENTRY'], 'Entry')
-        exit_cell = self.coordinates_to_cell(self.conf['EXIT'], 'Exit')
+        entry_cell = self.coordinates_to_cell(self.entry, 'Entry')
+        exit_cell = self.coordinates_to_cell(self.exit, 'Exit')
         for row in self.maze:
             for cell in row:
                 cell.print_self(
@@ -533,7 +560,7 @@ class MazeGenerator:
                     self.conf['VERTICAL_OFFSET']
                 )
                 stdscr.refresh()
-                sleep(self.conf['SECONDS'] / (self.conf['WIDTH'] * self.conf['HEIGHT']))
+                sleep(self.conf['SECONDS'] / (self.width * self.height))
 
                 if curr == entry_cell:
                     break

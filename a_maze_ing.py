@@ -17,6 +17,7 @@ def print_legend(stdscr: curses.window, configs: dict):
             f"(current: {configs['GEN_ALGORITHM']})",
             "p = pathfinder algorithm "
             f"(current: {configs['SOLVING_ALGORITHM']})",
+            f"k = Perfect: {configs['PERFECT']}",
             "c = color palette | s = change seed | w = width++ | h = height++",
             ]
 
@@ -142,6 +143,9 @@ def ch_parsing(
             configs['GEN_ALGORITHM'] = 'dfs'
         else:
             configs['GEN_ALGORITHM'] = 'prim'
+        print_legend(stdscr, configs)
+    elif ch == ord('k'):
+        configs['PERFECT'] = not configs['PERFECT']
         print_legend(stdscr, configs)
     elif ch == ord('o'):
         stdscr.clear()

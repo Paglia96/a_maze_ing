@@ -25,7 +25,7 @@ class Wall(IntFlag):
     LEFT = 8 # 1000
 
 
-    def opposite_wall(self) -> "MazeGenerator.Wall":
+    def opposite_wall(self) -> Wall:
         """Receives a single wall and returns its reversed value"""
         if self == Wall.UP:
             return Wall.DOWN
@@ -63,7 +63,7 @@ class Cell:
     end: bool = False
     explored: bool = False
     is_path: bool = False
-    parent: "Cell | None" = None
+    parent: Cell | None = None
     mouse_tracks: ClassVar[int] = 0
 
     def adjacent_cell(self, wall: str) -> tuple[
@@ -174,7 +174,7 @@ class Cell:
             stdscr.addch(row + 1, col + 1, '🧀', palette)
         elif self.is_path:
             type(self).mouse_tracks += 1
-            if type(self).mouse_tracks % 2:
-                stdscr.addch(row + 1, col + 1, '🐾', palette)
+            if type(self).mouse_tracks % 3:
+                stdscr.addstr(row + 1, col + 1, ' * ', palette)
             else:
-                stdscr.addch(row + 1, col + 2, '🐾', palette)
+                stdscr.addstr(row + 1, col + 2, '* ', palette)

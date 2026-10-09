@@ -101,7 +101,7 @@ def print_matrix(
         horizontal_offset = cast(int, configs['HORIZONTAL_OFFSET'])
         vertical_offset = cast(int, configs['VERTICAL_OFFSET'])
 
-        for cell in chain.from_iterable(maze):
+        for cell in chain.from_iterable(maze.get_maze()):
             print_method(
                 cell,
                 stdscr,
@@ -122,17 +122,21 @@ def maze_stats_to_txt(
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
 
+    entry = cast(tuple[int, int], configs['ENTRY'])
+    exit = cast(tuple[int, int], configs['EXIT'])
+    
+
     with open(filename, 'w') as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
         f.write(
-                f"{cast(int, configs['ENTRY'][0])}, "
-                f"{cast(int, configs['ENTRY'][1])}"
+                f"{entry[0]}, "
+                f"{entry[1]}"
                 ' ' * 5 + '# entry   (x, y)'
                 )
         f.write(
-                f"{cast(int, configs['EXIT'][0])}, "
-                f"{cast(int, configs['EXIT'][1])}"
+                f"{exit[0]}, "
+                f"{exit[1]}"
                 ' ' * 5 + '# exit   (x, y)'
                 )
         #f.write(f'\n{configs['SOLUTION']}\n')

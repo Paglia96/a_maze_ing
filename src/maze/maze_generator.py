@@ -1,9 +1,9 @@
 from time import sleep
-from typing import Callable, ClassVar
+from typing import Callable, ClassVar, Iterator
 from random import seed, choice, randint
 from ..parser import Configs
-from typing import cast
 from .cell import Wall, Cell
+from typing import cast
 import curses as c
 
 
@@ -16,11 +16,9 @@ class MazeGenerator:
         maze: the labirinth
     """
 
-
-    Wall = Wall
-    Cell = Cell
+    from .cell import Wall, Cell
     
-    def _init_(self, configs: Configs) -> None:
+    def __init__(self, configs: Configs) -> None:
         """
         Initialize a maze generator instance
 
@@ -54,9 +52,9 @@ class MazeGenerator:
                 vertical_offset := (self.height - 7) // 2
                 )
 
-        self.maze: list[list[MazeGenerator.Cell]] = []
+        self.maze: list[list[Cell]] = []
         for x in range(self.width):
-            rows: list[MazeGenerator.Cell] = []
+            rows: list[Cell] = []
             for y in range(self.height):
                 for ft_x, ft_y in self.ft_logo:
                     if (ft_x == x and ft_y == y
@@ -81,9 +79,7 @@ class MazeGenerator:
                         )
 
         
-    def _getitem_(self, index: int) -> list[
-        "MazeGenerator.Cell"
-    ]:
+    def __getitem__(self, index: int) -> list[Cell]:
         """Makes MazeGenerator a subscriptable object.
 
         Raises:
@@ -93,8 +89,15 @@ class MazeGenerator:
             self.maze at the required index
         """
         return self.maze[index]
+
+    def __iter__(self) -> Iterator[list[Cell]]:
+        return iter(self.maze)
+
+
+    def get_maze(self) -> list[list[Cell]]:
+        return self.maze
     
-    def _random_valid_starting_cell(self) -> "MazeGenerator.Cell":
+    def _random_valid_starting_cell(self) -> Cell:
         while (cell := self[
             randint(0, self.width - 1)
         ][
@@ -105,8 +108,8 @@ class MazeGenerator:
 
 
     def _valid_walls(
-            self, cell: "MazeGenerator.Cell"
-            ) -> list["MazeGenerator.Wall"]:
+            self, cell: Cell
+            ) -> list[Wall]:
         """Receives a cell and returns a list of walls considered valid
         The wall of a cell is considered valid if:
         -the adjacent cell is still not visited
@@ -141,8 +144,8 @@ class MazeGenerator:
 
     def _print_animation(
             self,
-            current: "MazeGenerator.Cell",
-            adjacent: "MazeGenerator.Cell",
+            current: Cell,
+            adjacent: Cell,
             stdscr: c.window,
             palette: int,
             horizontal_offset: int,
@@ -165,9 +168,9 @@ class MazeGenerator:
                 seconds: float
                 ) -> None:
         seed(seed_rand)
-        cells: list[
-            "MazeGenerator.Cell"
-            ] = [self._random_valid_starting_cell()]
+        cells: list[Cell] = [
+            self._random_valid_starting_cell()
+            ]
         cells[0].is_visited = True
         while cells:
             current = choice(cells)
@@ -196,10 +199,8 @@ class MazeGenerator:
 
 
     def _valid_closest_cells(
-            self, cell: "MazeGenerator.Cell"
-            ) -> list[tuple[
-                "MazeGenerator.Cell", "MazeGenerator.Wall"
-                ]]:
+            self, cell: Cell
+            ) -> list[tuple[Cell, Wall]]:
         closest_cells = []
         for wall in self._valid_walls(cell):
             x, y = cell.adjacent_cell(cast(str, wall.name))
@@ -216,14 +217,14 @@ class MazeGenerator:
                 seconds: float
                 ) -> None:
         seed(seed_rand)
-        stack: list[
-                "MazeGenerator.Cell"
-            ] = [self._random_valid_starting_cell()]
+        stack: list[Cell] = [
+            self._random_valid_starting_cell()
+            ]
         stack[0].is_visited = True
         while stack:
             current = stack.pop()
             closest: list[
-                tuple["MazeGenerator.Cell", "MazeGenerator.Wall"]
+                tuple[Cell, Wall]
                 ] = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
@@ -243,7 +244,7 @@ class MazeGenerator:
                 )
 
 
-    def open_walls(self, cell: "MazeGenerator.Cell") -> int:
+    def open_walls(self, cell: Cell) -> int:
         "Counts the open walls of a cell"
         "if has only one wall open is a dead end"
         count = 0
@@ -254,10 +255,8 @@ class MazeGenerator:
 
 
     def closed_valid_walls(
-            self, cell: "MazeGenerator.Cell"
-            ) -> list[tuple[
-            "MazeGenerator.Wall", "MazeGenerator.Cell"
-            ]]:
+            self, cell: Cell
+            ) -> list[tuple[Wall, Cell]]:
         "same of valid walls but controls"
         "only if the wall is breakable (no border no logo)"
 
@@ -330,7 +329,7 @@ class MazeGenerator:
 
     def coordinates_to_cell(
             self, config_cell: tuple[int, int], node_type: str
-            ) -> "MazeGenerator.Cell":
+            ) -> Cell:
         cell: MazeGenerator.Cell = self[config_cell[0]][config_cell[1]]
         cell.entry = node_type == "Entry"
         cell.end = node_type == "Exit"
@@ -386,7 +385,7 @@ class MazeGenerator:
                         exploring.append(adjacent)
 
         if found_exit:
-            curr: "MazeGenerator.Cell" | None = exit_cell
+            curr: Cell | None = exit_cell
             while curr:
                 curr.is_path = True
                 curr.print_self(

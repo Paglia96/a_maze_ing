@@ -53,7 +53,7 @@ def file_parsing(configs: Configs, filename: str) -> None:
             if line.startswith("#") or line == "\n":
                 continue
             elif "#" in line:
-                line: list[str] = line.split("#")[0]
+                line = line.split("#")[0]
             config = line.split("=")
             if len(config) != 2:
                 raise ValueError(

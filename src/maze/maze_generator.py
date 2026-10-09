@@ -335,7 +335,21 @@ class MazeGenerator:
         cell.end = node_type == "Exit"
         return cell
 
-    def bfs(self, stdscr: c.window) -> None:
+
+    def give_direction(self, wall_name: str) -> str:
+        """ Take the wall and gives the direction"""
+        match wall_name:
+            case "DOWN":
+                return "S"
+            case "UP":
+                return "N"
+            case "RIGHT":
+                return "E"
+            case "LEFT":
+                return "W"
+
+
+    def bfs(self, stdscr: c.window) -> str:
         """Finds the shortest path usign breadth first search alghorithm,
         storing each cell parent and rebuilding the path from exit to entry
         """
@@ -382,12 +396,15 @@ class MazeGenerator:
                     if not adjacent.explored:
                         adjacent.explored = True
                         adjacent.parent = current
+                        adjacent.direction = self.give_direction(wall.name)
                         exploring.append(adjacent)
 
         if found_exit:
-            curr: Cell | None = exit_cell
+            curr: Cell = exit_cell
+            path: list[str] = []
             while curr:
                 curr.is_path = True
+                path.append(curr.direction)
                 curr.print_self(
                     stdscr, palette,
                     horizontal_offset, vertical_offset
@@ -398,3 +415,8 @@ class MazeGenerator:
                 if curr == entry_cell:
                     break
                 curr = curr.parent
+        
+        if not exploring and not found_exit:
+            return ""
+        path.reverse()
+        return "".join(path)

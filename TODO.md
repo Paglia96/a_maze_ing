@@ -4,7 +4,6 @@ What does this mean?
 
 # Urgent
 - print to file solving algorithm sequence and test the result with moulinette
-- imperfect algorithm --> control 3x3area
 - Show/Hide a valid shortest path from the entrance to the exit. (just put a default flag parameter in print self hide=False that prints 3 spaces if True)
 
 # To do at the end of the project:

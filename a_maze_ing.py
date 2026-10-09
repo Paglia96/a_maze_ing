@@ -117,7 +117,7 @@ def print_matrix(
 
 
 def maze_stats_to_txt(
-        configs: Configs, maze: Maze) -> None:
+        configs: Configs, maze: Maze, path: str) -> None:
     filename = cast(str, configs['OUTPUT_FILE'])
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
@@ -129,17 +129,19 @@ def maze_stats_to_txt(
     with open(filename, 'w') as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
-        f.write(
-                f"{entry[0]}, "
-                f"{entry[1]}"
-                ' ' * 5 + '# entry   (x, y)'
-                )
-        f.write(
-                f"{exit[0]}, "
-                f"{exit[1]}"
-                ' ' * 5 + '# exit   (x, y)'
-                )
+        #f.write(
+        #        f"{entry[0]}, "
+        #        f"{entry[1]}"
+        #        ' ' * 5 + '# entry   (x, y)'
+        #        )
+        #f.write(
+        #        f"{exit[0]}, "
+        #        f"{exit[1]}"
+        #        ' ' * 5 + '# exit   (x, y)'
+        #        )
         #f.write(f'\n{configs['SOLUTION']}\n')
+        f.write(f"\n{path}")
+
 
 
 def extend_configs(
@@ -190,8 +192,8 @@ def ch_parsing(
         configs['PALETTE'] = next(color_pair)
         stdscr.bkgd(' ', cast(int, configs['PALETTE']))
     elif ch == ord('n'):
-        solve_maze_path(configs, maze, stdscr)
-        maze_stats_to_txt(configs, maze)
+        x = solve_maze_path(configs, maze, stdscr)
+        maze_stats_to_txt(configs, maze, x)
     elif ch == ord('s'):
         configs['SEED'] = cast(int, configs['SEED']) + 1
         stdscr.clear()
@@ -251,10 +253,11 @@ def a_maze_ing(stdscr: curses.window) -> bool:
 
 def solve_maze_path(
         configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> None:
+        ) -> str:
     if configs['SOLVING_ALGORITHM'] == 'bfs':
-        maze.bfs(stdscr)
+        path = maze.bfs(stdscr)
     refresh_and_sleep(0, stdscr)
+    return path
 
 
 def main(stdscr: curses.window) -> None:

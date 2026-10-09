@@ -87,6 +87,14 @@ def maze_stats_to_txt(configs: dict, maze: MazeGenerator):
     with open(configs["OUTPUT_FILE"], "w") as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
+        f.write(
+                f"{configs['ENTRY'][0]}, {configs['ENTRY'][1]}"
+                ' ' * 5 + '# entry   (x, y)'
+                )
+        f.write(
+                f"{configs['EXIT'][0]}, {configs['EXIT'][1]}"
+                ' ' * 5 + '# exit   (x, y)'
+                )
         # f.write(f'\n{configs['SOLUTION']}\n')
 
 

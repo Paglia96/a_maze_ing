@@ -214,7 +214,7 @@ class MazeGenerator:
         stack[0].is_visited = True
         while stack:
             current = stack.pop()
-            closest: list[tuple] = self._valid_closest_cells(current)
+            closest: tuple = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
                 adjacent, wall = choice(closest)

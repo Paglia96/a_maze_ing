@@ -15,8 +15,7 @@ debug:
 	python -m pdb $(MAIN) $(CONFIG)
 
 clean:
-	rm -R __pycache__ .mypy_cache
-
+	find . -type d \( -name "__pycache__" -o -name ".mypy_cache" \) -exec rm -rf {} +
 lint:
 	flake8 .
 	mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs

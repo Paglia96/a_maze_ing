@@ -1,6 +1,7 @@
 from time import sleep
 from random import seed, choice, randint
 from .cell import Cell, Wall
+import curses as c
 
 
 class MazeGenerator:

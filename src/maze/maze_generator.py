@@ -461,43 +461,43 @@ class MazeGenerator:
             seconds: float
             ) -> None:
 
-        while True:
-            dead_ends = []
+        #while True:
+        dead_ends = []
 
-            for row in self.maze:
-                for cell in row:
-                    if cell.ft_logo:
-                        continue
-                    if self.open_walls(cell) == 1:
-                        dead_ends.append(cell)
-            if not dead_ends:
-                break
-
-            changed = False
-
-            for cell in dead_ends:
-                if self.open_walls(cell) != 1:
+        for row in self.maze:
+            for cell in row:
+                if cell.ft_logo:
                     continue
-                breakable_walls = self.closed_valid_walls(cell)
-                if not breakable_walls:
-                    continue
-                wall, adjacent = choice(breakable_walls)
-                cell.remove_wall(wall)
-                adjacent.remove_wall(wall.opposite_wall())
-                self.__print_animation(
-                                cell,
-                                adjacent,
-                                stdscr,
-                                palette,
-                                horizontal_offset,
-                                vertical_offset,
-                                seconds
-                                )
+                if self.open_walls(cell) == 1:
+                    dead_ends.append(cell)
+           # if not dead_ends:
+            #    break
 
-                changed = True
+            #changed = False
 
-            if not changed:
-                break
+        for cell in dead_ends:
+            if self.open_walls(cell) != 1:
+                continue
+            breakable_walls = self.closed_valid_walls(cell)
+            if not breakable_walls:
+                continue
+            wall, adjacent = choice(breakable_walls)
+            cell.remove_wall(wall)
+            adjacent.remove_wall(wall.opposite_wall())
+            self.__print_animation(
+                            cell,
+                            adjacent,
+                            stdscr,
+                            palette,
+                            horizontal_offset,
+                            vertical_offset,
+                            seconds
+                            )
+
+                #changed = True
+
+            #if not changed:
+               # break
 
 
     def coordinates_to_cell(

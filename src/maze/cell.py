@@ -65,7 +65,7 @@ class Cell:
     is_path: bool = False
     parent: Cell | None = None
     mouse_tracks: ClassVar[int] = 0
-    direction: ClassVar[str] = ""
+    direction: str = ""
 
     def adjacent_cell(self, wall: str) -> tuple[
                             int, int]:

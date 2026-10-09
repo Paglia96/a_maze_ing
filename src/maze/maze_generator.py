@@ -347,6 +347,8 @@ class MazeGenerator:
                 return "E"
             case "LEFT":
                 return "W"
+            case _:
+                raise ValueError(f"Invalid wall name:{wall_name}")
 
 
     def bfs(self, stdscr: c.window) -> str:
@@ -391,6 +393,8 @@ class MazeGenerator:
 
             for wall in self.Wall:
                 if not (current.walls & wall):
+                    if wall.name is None:
+                        continue
                     x, y = current.adjacent_cell(cast(str, wall.name))
                     adjacent = self[x][y]
                     if not adjacent.explored:
@@ -400,7 +404,7 @@ class MazeGenerator:
                         exploring.append(adjacent)
 
         if found_exit:
-            curr: Cell = exit_cell
+            curr: Cell | None = exit_cell
             path: list[str] = []
             while curr:
                 curr.is_path = True

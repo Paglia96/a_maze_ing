@@ -7,6 +7,7 @@ Configs = dict[str, ConfigValue]
 
 
 def values_check(configs: Configs) -> None:
+    """Convert and validate the configuration values."""
     width, height = (configs['WIDTH'], configs['HEIGHT'])
     configs['WIDTH'] = int(cast(str, height))
     configs['HEIGHT'] = int(cast(str, width))
@@ -39,6 +40,7 @@ def values_check(configs: Configs) -> None:
 
 
 def file_parsing(configs: Configs, filename: str) -> None:
+    """Read the configuration file and store its values."""
     with open(filename, 'r') as f:
         config_keys: list[str] = [
             "WIDTH",
@@ -66,6 +68,7 @@ def file_parsing(configs: Configs, filename: str) -> None:
                     configs: Configs,
                     keys_list: list[str]
                     ) -> None:
+                """Add a valid configuration key to the dictionary."""
                 if (key := config[0].upper()) in keys_list:
                     keys_list.remove(key)
                     if key in configs:

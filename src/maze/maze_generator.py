@@ -27,13 +27,6 @@ class MazeGenerator:
             height: height of the labyrinth
             maze: the matrix representation of a labyrinth
         """
-        """
-        Maze minimum width 8 min height 6
-        to find horizontal_offset= (maze_width - ft_width) /2
-        vertical_offset= (maze_height - ft_height) /2
-        Logo width x height 7 x 4
-        
-        """
         self.conf = configs
         self.width = cast(int, configs['WIDTH'])
         self.height = cast(int, configs['HEIGHT'])
@@ -91,13 +84,16 @@ class MazeGenerator:
         return self.maze[index]
 
     def __iter__(self) -> Iterator[list[Cell]]:
+        """Return an iterator over the maze."""
         return iter(self.maze)
 
 
     def get_maze(self) -> list[list[Cell]]:
+        """Return the maze matrix."""
         return self.maze
     
     def _random_valid_starting_cell(self) -> Cell:
+        """Return a random cell outside the logo."""
         while (cell := self[
             randint(0, self.width - 1)
         ][
@@ -152,6 +148,7 @@ class MazeGenerator:
             vertical_offset: int,
             seconds: float
             ) -> None:
+        """Draw two cells and update the screen."""
         current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         stdscr.refresh()
@@ -167,6 +164,7 @@ class MazeGenerator:
                 seed_rand: int,
                 seconds: float
                 ) -> None:
+        """Generate a maze using Prim's algorithm."""
         seed(seed_rand)
         cells: list[Cell] = [
             self._random_valid_starting_cell()
@@ -201,6 +199,7 @@ class MazeGenerator:
     def _valid_closest_cells(
             self, cell: Cell
             ) -> list[tuple[Cell, Wall]]:
+        """Find valid neighboring cells and their walls."""
         closest_cells = []
         for wall in self._valid_walls(cell):
             x, y = cell.adjacent_cell(cast(str, wall.name))
@@ -216,6 +215,8 @@ class MazeGenerator:
                 seed_rand: int,
                 seconds: float
                 ) -> None:
+        """Generate a maze using depth-first search."""
+
         seed(seed_rand)
         stack: list[Cell] = [
             self._random_valid_starting_cell()
@@ -245,8 +246,9 @@ class MazeGenerator:
 
 
     def open_walls(self, cell: Cell) -> int:
-        "Counts the open walls of a cell"
-        "if has only one wall open is a dead end"
+        """Counts the open walls of a cell
+        "if has only one wall open is a dead end
+        """
         count = 0
         for wall in self.Wall:
             if not (cell.walls & wall):
@@ -257,8 +259,10 @@ class MazeGenerator:
     def closed_valid_walls(
             self, cell: Cell
             ) -> list[tuple[Wall, Cell]]:
-        "same of valid walls but controls"
-        "only if the wall is breakable (no border no logo)"
+        """
+        Return breakable walls and 
+        their neighboring cells.
+        """
 
         breakable_walls = []
 
@@ -287,8 +291,8 @@ class MazeGenerator:
             vertical_offset: int,
             seconds: float
             ) -> None:
+        """Remove dead ends by opening extra walls."""
 
-        #while True:
         dead_ends = []
 
         for row in self.maze:
@@ -297,10 +301,6 @@ class MazeGenerator:
                     continue
                 if self.open_walls(cell) == 1:
                     dead_ends.append(cell)
-           # if not dead_ends:
-            #    break
-
-            #changed = False
 
         for cell in dead_ends:
             if self.open_walls(cell) != 1:
@@ -321,15 +321,11 @@ class MazeGenerator:
                             seconds
                             )
 
-                #changed = True
-
-            #if not changed:
-               # break
-
 
     def coordinates_to_cell(
             self, config_cell: tuple[int, int], node_type: str
             ) -> Cell:
+        """Get a cell and mark it as entry or exit."""
         cell: MazeGenerator.Cell = self[config_cell[0]][config_cell[1]]
         cell.entry = node_type == "Entry"
         cell.end = node_type == "Exit"
@@ -354,6 +350,9 @@ class MazeGenerator:
     def bfs(self, stdscr: c.window) -> str:
         """Finds the shortest path usign breadth first search alghorithm,
         storing each cell parent and rebuilding the path from exit to entry
+        Returns:
+        A string containing the path directions.
+        An empty string if no path exists.
         """
         from collections import deque
         from itertools import chain

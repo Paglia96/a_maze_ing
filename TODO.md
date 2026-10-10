@@ -1,9 +1,5 @@
-dead-ends should stay rare (a couple are tolerated); a board with no dead-end
-at all is the ideal and is rewarded as a bonus (see the Bonuses chapter).
-What does this mean?
-
 # Urgent
-- print to file solving algorithm sequence and test the result with moulinette
+- print to file solving algorithm sequence and test the result with moulinette(implemneted must be tested with moulinette)
 - Show/Hide a valid shortest path from the entrance to the exit. (just put a default flag parameter in print self hide=False that prints 3 spaces if True)
 
 # To do at the end of the project:

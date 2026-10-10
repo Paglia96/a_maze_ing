@@ -84,6 +84,7 @@ class Cell:
 
 
     def remove_wall(self, wall: "Wall") -> None:
+        """Remove the given wall from the cell."""
         self.walls &= ~wall
 
     def print_base(

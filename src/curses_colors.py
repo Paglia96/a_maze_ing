@@ -1,6 +1,11 @@
 import curses
 
 def init_colors() -> list[int]:
+    """Initialize curses color pairs.
+
+    Returns:
+    A list of color pairs used to draw the maze.
+    """
     curses.start_color()
     colors = [
         (curses.COLOR_RED, curses.COLOR_BLACK),

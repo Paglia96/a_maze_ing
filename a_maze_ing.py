@@ -14,12 +14,14 @@ Maze = MazeGenerator
 def refresh_and_sleep(
         seconds: float, stdscr: curses.window
         ) -> None:
+    """Refresh the screen and wait for the given time."""
     stdscr.refresh()
     sleep(seconds)
 
 
 def print_legend(
         stdscr: curses.window, configs: Configs) -> None:
+    """Display the maze commands and current settings."""
     width = cast(int, configs['WIDTH'])
     rows = cast(int, configs['ROWS'])
     cols = cast(int, configs['COLS'])
@@ -57,6 +59,7 @@ def print_legend(
 def generate_maze(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
+    """Generate the maze using the selected algorithm."""
     args: tuple[
         curses.window, int, int, int, int, float
         ] = ( 
@@ -85,6 +88,7 @@ def generate_maze(
 def print_matrix(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
+    """Draw the maze matrix on the screen."""
     def print_step(
             configs: Configs,
             maze: Maze,
@@ -94,9 +98,7 @@ def print_matrix(
                 None
             ]
             ) -> None:
-        
-        width = cast(int, configs['WIDTH'])
-        height = cast(int, configs['HEIGHT'])
+        """Draw all cells using the given print method."""
         palette = cast(int, configs['PALETTE'])
         horizontal_offset = cast(int, configs['HORIZONTAL_OFFSET'])
         vertical_offset = cast(int, configs['VERTICAL_OFFSET'])
@@ -118,6 +120,7 @@ def print_matrix(
 
 def maze_stats_to_txt(
         configs: Configs, maze: Maze, path: str) -> None:
+    """Save the maze and its solution to a text file."""
     filename = cast(str, configs['OUTPUT_FILE'])
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
@@ -143,9 +146,9 @@ def maze_stats_to_txt(
         f.write(f"\n{path}")
 
 
-
 def extend_configs(
         configs: Configs, stdscr: curses.window) -> None:
+    """Update the screen size and maze offsets."""
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
     n_rows, n_cols = stdscr.getmaxyx()
@@ -160,6 +163,7 @@ def extend_configs(
 def color_generator(
         color_pairs: list[int]
         ) -> Generator[int, None, None]:
+    """Return color pairs in a continuous cycle."""
     from itertools import cycle
     for color_pair in cycle(color_pairs):
         yield color_pair
@@ -168,6 +172,7 @@ def color_generator(
 def generate_and_print_matrix(
         configs: Configs, stdscr: curses.window
         ) -> Maze:
+    """Create and display a new maze matrix."""
     extend_configs(configs, stdscr)
     matrix = MazeGenerator(configs)
     print_legend(stdscr, configs)
@@ -182,6 +187,7 @@ def ch_parsing(
         stdscr: curses.window,
         color_pair: Generator[int, None, None]
         ) -> Maze:
+    """Handle keyboard commands and update the maze."""
     if ch == ord('h'):
         configs['WIDTH'] = cast(int, configs['WIDTH']) + 1
         ch = ord('l')
@@ -254,6 +260,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
 def solve_maze_path(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> str:
+    """Find and display the maze solution."""
     if configs['SOLVING_ALGORITHM'] == 'bfs':
         path = maze.bfs(stdscr)
     refresh_and_sleep(0, stdscr)

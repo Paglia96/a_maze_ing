@@ -6,7 +6,6 @@
 - quando si modificano le dimensioni del terminale fai subito un reload del labirinto
 - generic error handling in main
 - remove import traceback
-- add docstrings
 - linting
 - Complete the readme
 

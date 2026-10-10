@@ -1,9 +1,9 @@
 # Required
 
-WIDTH=8 # int
-HEIGHT=8 # int
-ENTRY=0,0 # int, int
-EXIT=7,7 # int, int
+WIDTH=15 # int
+HEIGHT=15 # int
+ENTRY=3,0 # int, int
+EXIT=9,11 # int, int
 OUTPUT_FILE=maze.txt # file name
 PERFECT=TRUE # bool
 

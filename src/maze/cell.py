@@ -115,6 +115,16 @@ class Cell:
         """
         self.walls &= ~wall
 
+
+    def add_wall(self, wall: "Wall") -> None:
+        """ Add the given wall to the cell
+
+        Args:
+            wall: The wall to add
+        """
+        self.walls |= wall
+
+
     def print_base(
             self,
             stdscr: c.window,
@@ -204,3 +214,5 @@ class Cell:
                 stdscr.addstr(row + 1, col + 1, ' * ', palette)
             else:
                 stdscr.addstr(row + 1, col + 2, '* ', palette)
+        else:
+            stdscr.addstr(row + 1, col + 1, '   ', palette)

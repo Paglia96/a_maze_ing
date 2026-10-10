@@ -235,6 +235,28 @@ def generate_and_print_matrix(
     print_matrix(configs, matrix, stdscr)
     return matrix
 
+def restore_perfect_maze(
+        configs: Configs, maze: Maze, stdscr: curses.window
+        ) -> None:
+    maze.restore_walls(
+        stdscr,
+        cast(int, configs['PALETTE']),
+        cast(int, configs['HORIZONTAL_OFFSET']),
+        cast(int, configs['VERTICAL_OFFSET']),
+        cast(float, configs['SECONDS'])
+        )
+
+
+def perfect_to_imperfect(
+        configs: Configs, maze: Maze, stdscr: curses.window
+        ) -> None:
+    maze.remove_dead_ends(
+        stdscr,
+        cast(int, configs['PALETTE']),
+        cast(int, configs['HORIZONTAL_OFFSET']),
+        cast(int, configs['VERTICAL_OFFSET']),
+        cast(float, configs['SECONDS'])
+        )
 
 def ch_parsing(
         ch: int,
@@ -266,12 +288,14 @@ def ch_parsing(
         stdscr.bkgd(' ', cast(int, configs['PALETTE']))
     elif ch == ord('n'):
         x = solve_maze_path(configs, maze, stdscr)
+        maze.generated_path = True
         maze_stats_to_txt(configs, maze, x)
     elif ch == ord('s'):
         configs['SEED'] = cast(int, configs['SEED']) + 1
         stdscr.clear()
         maze = generate_and_print_matrix(configs, stdscr)
         ch = ord('m')
+        maze.generated_path = False
     elif ch == ord('d'):
         configs['SECONDS'] = cast(float, configs['SECONDS']) + 0.5
     elif ch == ord('i'):
@@ -287,10 +311,22 @@ def ch_parsing(
     elif ch == ord('k'):
         configs['PERFECT'] = not cast(bool, configs['PERFECT'])
         print_legend(stdscr, configs)
+        if maze:
+            if configs['PERFECT'] == True:
+                restore_perfect_maze(configs, maze, stdscr)
+            else:
+                perfect_to_imperfect(configs, maze, stdscr)
+        if maze.generated_path == True:
+            x = solve_maze_path(configs, maze, stdscr)
+            maze_stats_to_txt(configs, maze, x)
+        else:
+            pass
+
     elif ch == ord("o"):
         stdscr.clear()
     if ch == ord("l"):
         stdscr.clear()
+        maze.generated_path = False
         return generate_and_print_matrix(configs, stdscr)
     elif ch == ord("m"):
         generate_maze(configs, maze, stdscr)
@@ -317,6 +353,9 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     stdscr.bkgd(' ', cast(int, configs['PALETTE']))
     maze: Maze = generate_and_print_matrix(configs, stdscr)
     while ch := stdscr.getch():
+        if ch == -1:
+            curses.napms(10)
+            continue
         if ch == ord("q"):
             break
         elif ch == ord("r"):

@@ -103,7 +103,7 @@ Follow the instructions printed on the terminal screen with curses
 
 ### Role of each team member
 - gipaglie: parsing of the config file, first implementation of the MazeGenerator class and the drawing of the matrix-maze with curses, prim algorithm
-- ccrucian: dfs and bfs algorithms, additions and changes to the project
+- ccrucian: dfs and bfs algorithms, additions and changes to the project, so much linting <3
 The collaboration was done using git, giving both member the ability to improve the knowledge of this control version software.
 
 

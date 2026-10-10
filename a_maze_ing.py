@@ -3,10 +3,7 @@ from typing import cast
 from itertools import chain, cycle
 from collections.abc import Generator, Callable
 from time import sleep
-
-from src.maze import MazeGenerator
-from src.parser import Configs, config_parser
-from src.curses_colors import init_colors
+from src import MazeGenerator, Configs, config_parser, init_colors
 
 Maze = MazeGenerator
 
@@ -212,7 +209,6 @@ def color_generator(
     Yields:
         The next color pair.
     """
-    from itertools import cycle
     for color_pair in cycle(color_pairs):
         yield color_pair
 

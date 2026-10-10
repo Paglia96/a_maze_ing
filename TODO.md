@@ -8,6 +8,7 @@
 - remove import traceback
 - linting
 - Complete the readme
+- Togliere runcarli dal makefile
 
 # MazeGenerator
 You must provide a short documentation describing how to:

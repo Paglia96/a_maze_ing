@@ -1,9 +1,11 @@
-from .parser import config_parser
-from time import sleep
-from dataclasses import dataclass, field
-from itertools import product, cycle
-from typing import Callable
-from .maze import *
-
+from .parser import Configs, config_parser
 from .curses_colors import init_colors
-from typing import Generator
+from .maze import MazeGenerator
+
+__all__ = [
+        'MazeGenerator',
+        'Configs',
+        'config_parser',
+        'init_colors'
+        ]
+

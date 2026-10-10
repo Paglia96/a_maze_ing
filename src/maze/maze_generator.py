@@ -1,11 +1,11 @@
 from time import sleep
-from typing import Callable, ClassVar, Iterator
+from typing import Iterator, cast
 from random import seed, choice, randint
-from ..parser import Configs
 from .cell import Wall, Cell
-from typing import cast
 import curses as c
 
+ConfigValue = str | int | bool | tuple[int, int] | float
+Configs = dict[str, ConfigValue]
 
 class MazeGenerator:
     """Represents the Maze and offers tools to work with it.

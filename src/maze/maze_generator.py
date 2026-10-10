@@ -23,9 +23,10 @@ class MazeGenerator:
         Initialize a maze generator instance
 
         Args:
-            width: width of the labyrinth
-            height: height of the labyrinth
-            maze: the matrix representation of a labyrinth
+            configs: The maze configuration
+        
+        Raises:
+            ValueError: If the entry or exit is inside the logo
         """
         self.conf = configs
         self.width = cast(int, configs['WIDTH'])
@@ -73,27 +74,39 @@ class MazeGenerator:
 
         
     def __getitem__(self, index: int) -> list[Cell]:
-        """Makes MazeGenerator a subscriptable object.
+        """Return the cells at the given index.
 
-        Raises:
-            IndexError: if the given index is out of range
+        Args:
+            index: The requested index.
 
         Returns:
-            self.maze at the required index
+            A list of cells.
         """
         return self.maze[index]
 
     def __iter__(self) -> Iterator[list[Cell]]:
-        """Return an iterator over the maze."""
+        """Return an iterator over the maze.
+
+        Returns:
+            An iterator over the maze columns.
+        """
         return iter(self.maze)
 
 
     def get_maze(self) -> list[list[Cell]]:
-        """Return the maze matrix."""
+        """Return the maze matrix.
+
+        Returns:
+            The matrix of cells.
+        """
         return self.maze
     
     def _random_valid_starting_cell(self) -> Cell:
-        """Return a random cell outside the logo."""
+        """Choose a random cell outside the logo.
+
+        Returns:
+            A valid starting cell.
+        """
         while (cell := self[
             randint(0, self.width - 1)
         ][
@@ -106,10 +119,13 @@ class MazeGenerator:
     def _valid_walls(
             self, cell: Cell
             ) -> list[Wall]:
-        """Receives a cell and returns a list of walls considered valid
-        The wall of a cell is considered valid if:
-        -the adjacent cell is still not visited
-        -the wall is breakable (not an edge of the maze, not part of the 42 logo)
+        """Find closed walls leading to unvisited cells.
+
+            Args:
+            cell: The cell to check.
+
+            Returns:
+                A list of valid walls.
         """
         walls = [wall for wall in self.Wall if cell.walls & wall]
         valid_walls = []
@@ -148,7 +164,17 @@ class MazeGenerator:
             vertical_offset: int,
             seconds: float
             ) -> None:
-        """Draw two cells and update the screen."""
+        """Draw two cells and refresh the screen.
+
+        Args:
+            current: The current cell.
+            adjacent: The adjacent cell.
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seconds: The animation duration.
+        """
         current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
         stdscr.refresh()
@@ -164,7 +190,16 @@ class MazeGenerator:
                 seed_rand: int,
                 seconds: float
                 ) -> None:
-        """Generate a maze using Prim's algorithm."""
+        """Generate a maze using Prim's algorithm.
+
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seed_rand: The random seed.
+            seconds: The animation duration.
+        """
         seed(seed_rand)
         cells: list[Cell] = [
             self._random_valid_starting_cell()
@@ -199,7 +234,16 @@ class MazeGenerator:
     def _valid_closest_cells(
             self, cell: Cell
             ) -> list[tuple[Cell, Wall]]:
-        """Find valid neighboring cells and their walls."""
+        """Generate a maze using DFS.
+
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seed_rand: The random seed.
+            seconds: The animation duration.
+        """
         closest_cells = []
         for wall in self._valid_walls(cell):
             x, y = cell.adjacent_cell(cast(str, wall.name))
@@ -215,8 +259,16 @@ class MazeGenerator:
                 seed_rand: int,
                 seconds: float
                 ) -> None:
-        """Generate a maze using depth-first search."""
+        """Generate a maze using DFS.
 
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seed_rand: The random seed.
+            seconds: The animation duration.
+        """
         seed(seed_rand)
         stack: list[Cell] = [
             self._random_valid_starting_cell()
@@ -246,8 +298,13 @@ class MazeGenerator:
 
 
     def open_walls(self, cell: Cell) -> int:
-        """Counts the open walls of a cell
-        "if has only one wall open is a dead end
+        """Count the open walls of a cell.
+
+        Args:
+            cell: The cell to check.
+
+        Returns:
+            The number of open walls.
         """
         count = 0
         for wall in self.Wall:
@@ -259,9 +316,13 @@ class MazeGenerator:
     def closed_valid_walls(
             self, cell: Cell
             ) -> list[tuple[Wall, Cell]]:
-        """
-        Return breakable walls and 
-        their neighboring cells.
+        """Find breakable walls and their neighboring cells.
+
+        Args:
+            cell: The cell to check.
+
+        Returns:
+            A list of walls and their neighboring cells.
         """
 
         breakable_walls = []
@@ -291,7 +352,15 @@ class MazeGenerator:
             vertical_offset: int,
             seconds: float
             ) -> None:
-        """Remove dead ends by opening extra walls."""
+        """Remove dead ends by opening extra walls.
+
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seconds: The animation duration.
+        """
 
         dead_ends = []
 
@@ -325,7 +394,15 @@ class MazeGenerator:
     def coordinates_to_cell(
             self, config_cell: tuple[int, int], node_type: str
             ) -> Cell:
-        """Get a cell and mark it as entry or exit."""
+        """Get a cell and mark it as entry or exit.
+
+        Args:
+            config_cell: The cell coordinates.
+            node_type: The type of cell.
+
+        Returns:
+            The updated cell.
+        """
         cell: MazeGenerator.Cell = self[config_cell[0]][config_cell[1]]
         cell.entry = node_type == "Entry"
         cell.end = node_type == "Exit"
@@ -333,7 +410,17 @@ class MazeGenerator:
 
 
     def give_direction(self, wall_name: str) -> str:
-        """ Take the wall and gives the direction"""
+        """Convert a wall name into a direction.
+
+        Args:
+            wall_name: The name of the wall.
+
+        Returns:
+            The cardinal direction.
+
+        Raises:
+            ValueError: If the wall name is invalid.
+        """
         match wall_name:
             case "DOWN":
                 return "S"
@@ -348,11 +435,13 @@ class MazeGenerator:
 
 
     def bfs(self, stdscr: c.window) -> str:
-        """Finds the shortest path usign breadth first search alghorithm,
-        storing each cell parent and rebuilding the path from exit to entry
+        """Find the shortest path using BFS.
+
+        Args:
+            stdscr: The curses window.
+
         Returns:
-        A string containing the path directions.
-        An empty string if no path exists.
+            The path directions, or an empty string if no path exists.
         """
         from collections import deque
         from itertools import chain

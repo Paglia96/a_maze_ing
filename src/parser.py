@@ -7,7 +7,13 @@ Configs = dict[str, ConfigValue]
 
 
 def values_check(configs: Configs) -> None:
-    """Convert and validate the configuration values."""
+    """Convert and validate the configuration values.
+    Args:
+        configs: The configuration dictionary.
+
+    Raises:
+        ValueError: If a configuration value is invalid
+    """
     width, height = (configs['WIDTH'], configs['HEIGHT'])
     configs['WIDTH'] = int(cast(str, height))
     configs['HEIGHT'] = int(cast(str, width))
@@ -40,7 +46,15 @@ def values_check(configs: Configs) -> None:
 
 
 def file_parsing(configs: Configs, filename: str) -> None:
-    """Read the configuration file and store its values."""
+    """Read the configuration file and store its values.
+
+    Args:
+        configs: The configuration dictionary.
+        filename: The configuration file path.
+
+    Raises:
+        ValueError: If the file has invalid or missing keys.
+    """
     with open(filename, 'r') as f:
         config_keys: list[str] = [
             "WIDTH",
@@ -50,7 +64,9 @@ def file_parsing(configs: Configs, filename: str) -> None:
             "OUTPUT_FILE",
             "PERFECT",
         ]
-        optional_keys: list[str] = ["SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"]
+        optional_keys: list[str] = [
+            "SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"
+            ]
         for line in f:
             if line.startswith("#") or line == "\n":
                 continue
@@ -59,7 +75,8 @@ def file_parsing(configs: Configs, filename: str) -> None:
             config = line.split("=")
             if len(config) != 2:
                 raise ValueError(
-                    "The configuration file must contain one ‘KEY=VALUE‘ pair per line."
+                    "The configuration file must contain one "
+                    "'KEY=VALUE' pair per line."
                 )
             config[0] = config[0].strip()
             config[1] = config[1][:-1].strip()  # remove ending \n e spaces
@@ -68,11 +85,22 @@ def file_parsing(configs: Configs, filename: str) -> None:
                     configs: Configs,
                     keys_list: list[str]
                     ) -> None:
-                """Add a valid configuration key to the dictionary."""
+                """Add a valid key to the configuration dictionary.
+
+                Args:
+                    config: The key and its value.
+                    configs: The configuration dictionary.
+                    keys_list: The list of allowed keys.
+
+                Raises:
+                    ValueError: If the key is already present.
+                """
                 if (key := config[0].upper()) in keys_list:
                     keys_list.remove(key)
                     if key in configs:
-                        raise ValueError("Just one KEY for allowed type.")
+                        raise ValueError(
+                            "Just one KEY for allowed type."
+                            )
                     configs[key] = config[1]
 
             upload_key(config, configs, config_keys)

@@ -14,14 +14,24 @@ Maze = MazeGenerator
 def refresh_and_sleep(
         seconds: float, stdscr: curses.window
         ) -> None:
-    """Refresh the screen and wait for the given time."""
+    """Refresh the screen and wait.
+
+    Args:
+        seconds: The time to wait.
+        stdscr: The curses window.
+    """
     stdscr.refresh()
     sleep(seconds)
 
 
 def print_legend(
         stdscr: curses.window, configs: Configs) -> None:
-    """Display the maze commands and current settings."""
+    """Display the commands and current settings.
+
+    Args:
+        stdscr: The curses window.
+        configs: The maze configuration.
+    """
     width = cast(int, configs['WIDTH'])
     rows = cast(int, configs['ROWS'])
     cols = cast(int, configs['COLS'])
@@ -56,10 +66,17 @@ def print_legend(
 
     refresh_and_sleep(0, stdscr)
 
+
 def generate_maze(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
-    """Generate the maze using the selected algorithm."""
+    """Generate the maze using the selected algorithm.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to generate.
+        stdscr: The curses window.
+    """
     args: tuple[
         curses.window, int, int, int, int, float
         ] = ( 
@@ -88,7 +105,13 @@ def generate_maze(
 def print_matrix(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
-    """Draw the maze matrix on the screen."""
+    """Draw the maze matrix on the screen.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to draw.
+        stdscr: The curses window.
+    """
     def print_step(
             configs: Configs,
             maze: Maze,
@@ -98,7 +121,14 @@ def print_matrix(
                 None
             ]
             ) -> None:
-        """Draw all cells using the given print method."""
+        """Draw all cells using the given method.
+
+        Args:
+            configs: The maze configuration.
+            maze: The maze to draw.
+            stdscr: The curses window.
+            print_method: The method used to draw each cell.
+        """
         palette = cast(int, configs['PALETTE'])
         horizontal_offset = cast(int, configs['HORIZONTAL_OFFSET'])
         vertical_offset = cast(int, configs['VERTICAL_OFFSET'])
@@ -120,7 +150,13 @@ def print_matrix(
 
 def maze_stats_to_txt(
         configs: Configs, maze: Maze, path: str) -> None:
-    """Save the maze and its solution to a text file."""
+    """Save the maze and its solution to a text file.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to save.
+        path: The solution path.
+    """
     filename = cast(str, configs['OUTPUT_FILE'])
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
@@ -148,7 +184,12 @@ def maze_stats_to_txt(
 
 def extend_configs(
         configs: Configs, stdscr: curses.window) -> None:
-    """Update the screen size and maze offsets."""
+    """Update the screen size and maze offsets.
+
+    Args:
+        configs: The maze configuration.
+        stdscr: The curses window.
+    """
     width = cast(int, configs['WIDTH'])
     height = cast(int, configs['HEIGHT'])
     n_rows, n_cols = stdscr.getmaxyx()
@@ -163,7 +204,14 @@ def extend_configs(
 def color_generator(
         color_pairs: list[int]
         ) -> Generator[int, None, None]:
-    """Return color pairs in a continuous cycle."""
+    """Generate color pairs in a continuous cycle.
+
+    Args:
+        color_pairs: The list of color pairs.
+
+    Yields:
+        The next color pair.
+    """
     from itertools import cycle
     for color_pair in cycle(color_pairs):
         yield color_pair
@@ -172,7 +220,15 @@ def color_generator(
 def generate_and_print_matrix(
         configs: Configs, stdscr: curses.window
         ) -> Maze:
-    """Create and display a new maze matrix."""
+    """Create and display a new maze matrix.
+
+    Args:
+        configs: The maze configuration.
+        stdscr: The curses window.
+
+    Returns:
+        The new maze.
+    """
     extend_configs(configs, stdscr)
     matrix = MazeGenerator(configs)
     print_legend(stdscr, configs)
@@ -187,7 +243,18 @@ def ch_parsing(
         stdscr: curses.window,
         color_pair: Generator[int, None, None]
         ) -> Maze:
-    """Handle keyboard commands and update the maze."""
+    """Handle keyboard commands and update the maze.
+
+    Args:
+        ch: The pressed key.
+        maze: The current maze.
+        configs: The maze configuration.
+        stdscr: The curses window.
+        color_pair: The color generator.
+
+    Returns:
+        The updated maze.
+    """
     if ch == ord('h'):
         configs['WIDTH'] = cast(int, configs['WIDTH']) + 1
         ch = ord('l')
@@ -231,12 +298,13 @@ def ch_parsing(
 
 
 def a_maze_ing(stdscr: curses.window) -> bool:
-    """Prints a matrix, breaks its cells to create a labyrinth and finds the shortest
-    path from a randomly genereted starting point to a randomly genereted
-    ending point. The all process is animated through curses.
+    """Run the interactive maze program.
 
-    Parameter:
-        stdscr: curses standard screen
+    Args:
+        stdscr: The curses window.
+
+    Returns:
+        True if a restart is requested, otherwise False.
     """
     configs: Configs = config_parser()
     color_pair: Generator[int, None, None] = color_generator(init_colors()) 
@@ -260,7 +328,16 @@ def a_maze_ing(stdscr: curses.window) -> bool:
 def solve_maze_path(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> str:
-    """Find and display the maze solution."""
+    """Find and display the shortest path.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to solve.
+        stdscr: The curses window.
+
+    Returns:
+        The solution path.
+    """
     if configs['SOLVING_ALGORITHM'] == 'bfs':
         path = maze.bfs(stdscr)
     refresh_and_sleep(0, stdscr)
@@ -270,7 +347,7 @@ def solve_maze_path(
 def main(stdscr: curses.window) -> None:
     """Loops a_maze_ing for every time the user asks to reload starting configuration.
 
-    Parameter:
+    Args:
         stdscr: curses standard screen
     """
     while a_maze_ing(stdscr):

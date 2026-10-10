@@ -26,7 +26,14 @@ class Wall(IntFlag):
 
 
     def opposite_wall(self) -> Wall:
-        """Receives a single wall and returns its reversed value"""
+        """Return the opposite wall.
+
+        Returns:
+            The opposite wall.
+
+        Raises:
+            ValueError: If the wall is invalid.
+        """
         if self == Wall.UP:
             return Wall.DOWN
         if self == Wall.DOWN:
@@ -49,6 +56,14 @@ class Cell:
         width: total width of the matrix
         height: total height of the matrix
         walls: instance of the Wall class
+         is_visited: Whether the cell was visited.
+        ft_logo: Whether the cell belongs to the logo.
+        entry: Whether the cell is the entry.
+        end: Whether the cell is the exit.
+        explored: Whether the cell was explored.
+        is_path: Whether the cell belongs to the solution.
+        parent: The previous cell in the path.
+        direction: The direction used to reach the cell.
     """
     x: int
     y: int
@@ -69,8 +84,17 @@ class Cell:
 
     def adjacent_cell(self, wall: str) -> tuple[
                             int, int]:
-        """Based on the cell wall received,
-        returns the coordinates of the adjacent cell"""
+        """Get the coordinates of the adjacent cell.
+
+        Args:
+            wall: The wall direction.
+
+        Returns:
+            The coordinates of the adjacent cell.
+
+        Raises:
+            ValueError: If the wall direction is invalid.
+        """
         match wall:
             case 'UP':
                 return (self.x - 1, self.y)
@@ -84,7 +108,11 @@ class Cell:
 
 
     def remove_wall(self, wall: "Wall") -> None:
-        """Remove the given wall from the cell."""
+        """Remove the given wall from the cell.
+        
+        Args:
+            wall: The wall to remove
+        """
         self.walls &= ~wall
 
     def print_base(
@@ -94,17 +122,13 @@ class Cell:
             horizontal_offset: int,
             vertical_offset: int
             ) -> None:
-        """Print only the sides of the cell that will not change
-        Args:
-            stdscr: the curses standard screen
-            palette: an int representing the curses color palette
-            horizontal_offset: the horizontal offset calculated to print
-                the x axys of the labirinth centered on the stdscr
-            vertical_offset: the vertical offset calculated to print
-                the y axys of the labirinth centered on the stdscr
+        """Draw the fixed borders of the cell.
 
-        Returns:
-            None 
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
         """
         row = (self.x * 2) + vertical_offset
         col = (self.y * 4) + horizontal_offset

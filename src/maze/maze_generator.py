@@ -11,9 +11,16 @@ class MazeGenerator:
     """Represents the Maze and offers tools to work with it.
 
     Attributes:
-        width: width of the labyrinth
-        height: height of the labirinth
-        maze: the labirinth
+        conf: The maze configuration
+        width: The number of maze rows
+        height: The number of maze columns.
+        entry: The entry coordinates.
+        exit: The exit coordinates
+        maze: The matrix of maze cells.
+        ft_logo: The coordinates of the 42 logo.
+        removed_walls: The walls removed in non-perfect mode
+        generated_path: Whether the solution path has been generated
+        generated: Wheter the maze has been generated
     """
 
     from .cell import Wall, Cell
@@ -35,6 +42,7 @@ class MazeGenerator:
         self.exit = cast(tuple[int, int], configs['EXIT'])
         self.removed_walls: list[tuple[Cell, Wall]] = []
         self.generated_path: bool = False
+        self.generated: bool = False
         self.ft_logo = (
             [0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2],
             [0, 4], [0, 5], [0, 6], [1, 6], [2, 4], [2, 5],
@@ -403,6 +411,15 @@ class MazeGenerator:
             vertical_offset: int,
             seconds: float
             ) -> None:
+        """Restore the walls removed in non-perfect mode.
+
+        Args:
+            stdscr: The curses window.
+            palette: The color palette.
+            horizontal_offset: The horizontal screen offset.
+            vertical_offset: The vertical screen offset.
+            seconds: The animation duration.
+        """
         while self.removed_walls:
             cell, wall = self.removed_walls.pop()
             cell.add_wall(wall)

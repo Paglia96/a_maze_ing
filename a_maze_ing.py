@@ -87,18 +87,14 @@ def generate_maze(
             cast(int, configs['SEED']),
             cast(float, configs['SECONDS'])
                 )
-    if configs['GEN_ALGORITHM'] == 'prim':
-        maze.prim_algorithm(*args)
-    else:
-        maze.dfs(*args)
-    if not configs["PERFECT"]:
-        maze.remove_dead_ends(
-            stdscr,
-            cast(int, configs['PALETTE']),
-            cast(int, configs['HORIZONTAL_OFFSET']),
-            cast(int, configs['VERTICAL_OFFSET']),
-            cast(float, configs['SECONDS'])
-            )
+    if not maze.generated:
+        if configs['GEN_ALGORITHM'] == 'prim':
+            maze.prim_algorithm(*args)
+        else:
+            maze.dfs(*args)
+        maze.generated = True
+        if not configs["PERFECT"]:
+            perfect_to_imperfect(configs, maze, stdscr)
     refresh_and_sleep(0, stdscr)
 
 
@@ -235,9 +231,17 @@ def generate_and_print_matrix(
     print_matrix(configs, matrix, stdscr)
     return matrix
 
+
 def restore_perfect_maze(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
+    """Restore the walls of the perfect maze.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to restore.
+        stdscr: The curses window.
+    """
     maze.restore_walls(
         stdscr,
         cast(int, configs['PALETTE']),
@@ -250,6 +254,13 @@ def restore_perfect_maze(
 def perfect_to_imperfect(
         configs: Configs, maze: Maze, stdscr: curses.window
         ) -> None:
+    """Remove dead ends to make the maze non-perfect.
+
+    Args:
+        configs: The maze configuration.
+        maze: The maze to modify.
+        stdscr: The curses window.
+    """
     maze.remove_dead_ends(
         stdscr,
         cast(int, configs['PALETTE']),
@@ -257,6 +268,7 @@ def perfect_to_imperfect(
         cast(int, configs['VERTICAL_OFFSET']),
         cast(float, configs['SECONDS'])
         )
+
 
 def ch_parsing(
         ch: int,
@@ -311,7 +323,7 @@ def ch_parsing(
     elif ch == ord('k'):
         configs['PERFECT'] = not cast(bool, configs['PERFECT'])
         print_legend(stdscr, configs)
-        if maze:
+        if maze.generated:
             if configs['PERFECT'] == True:
                 restore_perfect_maze(configs, maze, stdscr)
             else:
@@ -377,6 +389,7 @@ def solve_maze_path(
     Returns:
         The solution path.
     """
+    path = ""
     if configs['SOLVING_ALGORITHM'] == 'bfs':
         path = maze.bfs(stdscr)
     refresh_and_sleep(0, stdscr)

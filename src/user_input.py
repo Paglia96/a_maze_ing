@@ -39,17 +39,10 @@ def ch_parsing(
     """
     if ch == ord('h'):
         configs['WIDTH'] = cast(int, configs['WIDTH']) + 1
-        maze.width = cast(int, configs['WIDTH'])
-        if maze.generated:
-                maze_stats_to_txt(configs, maze, maze.path)
-                maze.generated = False
         ch = ord('l')
     elif ch == ord('w'):
         configs['HEIGHT'] = cast(int, configs['HEIGHT']) + 1
         ch = ord('l')
-        if maze.generated:
-            maze_stats_to_txt(configs, maze, maze.path)
-            maze.generated = False
     elif ch == ord('c'):
         configs['PALETTE'] = next(color_pair)
         stdscr.bkgd(' ', cast(int, configs['PALETTE']))
@@ -57,10 +50,9 @@ def ch_parsing(
         configs['SEED'] = cast(int, configs['SEED']) + 1
         stdscr.clear()
         maze = generate_and_print_matrix(configs, stdscr)
-        ch = ord('m')
         maze.generated_path = False
         maze.path = ""
-        maze_stats_to_txt(configs, maze, maze.path)
+        ch = ord('m')
     elif ch == ord('d'):
         configs['SECONDS'] = cast(float, configs['SECONDS']) + 0.5
     elif ch == ord('e'):
@@ -124,11 +116,11 @@ def ch_parsing(
     if ch == ord("l"):
         stdscr.clear()
         maze.generated_path = False
-        maze.generated = False
-        maze_stats_to_txt(configs, maze, maze.path)
+       # maze_stats_to_txt(configs, maze, maze.path)
         return generate_and_print_matrix(configs, stdscr)
     elif ch == ord("m"):
         generate_maze(configs, maze, stdscr)
+        maze_stats_to_txt(configs, maze, maze.path)
     elif ch == ord('n'):
         solve_maze_path(configs, maze, stdscr)
         maze.generated_path = True

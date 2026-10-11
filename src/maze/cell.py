@@ -115,6 +115,16 @@ class Cell:
         """
         self.walls &= ~wall
 
+
+    def add_wall(self, wall: "Wall") -> None:
+        """ Add the given wall to the cell
+
+        Args:
+            wall: The wall to add
+        """
+        self.walls |= wall
+
+
     def print_base(
             self,
             stdscr: c.window,
@@ -162,6 +172,7 @@ class Cell:
             palette: int,
             horizontal_offset: int,
             vertical_offset: int,
+            hide: bool = False
             ) -> None:
         """Print walls or spaces if there is no walls.
                 It prints:
@@ -199,8 +210,13 @@ class Cell:
         elif self.end:
             stdscr.addch(row + 1, col + 1, '🧀', palette)
         elif self.is_path:
-            type(self).mouse_tracks += 1
-            if type(self).mouse_tracks % 3:
-                stdscr.addstr(row + 1, col + 1, ' * ', palette)
+            if not hide:
+                stdscr.addstr(row + 1, col + 1, '   ', palette | c.A_REVERSE)
             else:
-                stdscr.addstr(row + 1, col + 2, '* ', palette)
+                stdscr.addstr(row + 1, col + 1, '   ', palette)
+            #x, y = self.adjacent_cell(Wall.UP.name)
+            #stdscr.addstr(0, 0, f'{self.x}, {self.y} | {self.parent.x}, {self.parent.y} | {x}, {y}', palette | c.A_REVERSE)
+            #if not (self.walls & Wall.DOWN) and self.parent and self.parent.x == x and self.parent.y == y:
+            #    stdscr.addstr(row + 2, col + 2, ' ', palette | c.A_REVERSE)
+        else:
+            stdscr.addstr(row + 1, col + 1, '   ', palette)

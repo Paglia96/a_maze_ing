@@ -13,6 +13,7 @@ from .maze_utils import (
         maze_stats_to_txt,
         solve_maze_path,
         )
+from . import Configs
 
 Maze = MazeGenerator
 
@@ -51,6 +52,8 @@ def ch_parsing(
         maze = generate_and_print_matrix(configs, stdscr)
         ch = ord('m')
         maze.generated_path = False
+        maze.path = ""
+        maze_stats_to_txt(configs, maze, maze.path)
     elif ch == ord('d'):
         configs['SECONDS'] = cast(float, configs['SECONDS']) + 0.5
     elif ch == ord('e'):
@@ -64,13 +67,25 @@ def ch_parsing(
                         )
             try:
                 assert configs['ENTRY'] != configs['EXIT']
-                stdscr.clear()
-                maze = generate_and_print_matrix(configs, stdscr)
-                maze.generated_path = False
-                generate_maze(configs, maze, stdscr)
+                #stdscr.clear()
+                #maze = generate_and_print_matrix(configs, stdscr)
+                #maze.generated_path = False
+                #generate_maze(configs, maze, stdscr)
+                #valid_value = True
+                #ch = ord('n')
+                entry = cast(tuple[int, int], configs['ENTRY'])
+                exit = cast(tuple[int, int], configs['EXIT'])
+                if (
+                    maze[entry[0]][entry[1]].ft_logo or
+                    maze[exit[0]][exit[1]].ft_logo
+                    ):
+                    continue
+                maze.entry = entry
+                maze.exit = exit
                 valid_value = True
-                ch = ord('n')
-            except ValueError, AssertionError:
+                if maze.generated_path:
+                    ch = ord('n')
+            except (ValueError, AssertionError):
                 pass
     elif ch == ord('i'):
         seconds = cast(float, configs['SECONDS'])
@@ -88,11 +103,13 @@ def ch_parsing(
         if maze.generated:
             if configs['PERFECT'] == True:
                 restore_perfect_maze(configs, maze, stdscr)
+                maze_stats_to_txt(configs, maze, maze.path)
             else:
                 perfect_to_imperfect(configs, maze, stdscr)
+                maze_stats_to_txt(configs, maze, maze.path)
         if maze.generated_path == True:
-            x = solve_maze_path(configs, maze, stdscr)
-            maze_stats_to_txt(configs, maze, x)
+            solve_maze_path(configs, maze, stdscr)
+            maze_stats_to_txt(configs, maze, maze.path)
         else:
             pass
     elif ch == ord("o"):
@@ -104,7 +121,7 @@ def ch_parsing(
     elif ch == ord("m"):
         generate_maze(configs, maze, stdscr)
     elif ch == ord('n'):
-        x = solve_maze_path(configs, maze, stdscr)
+        solve_maze_path(configs, maze, stdscr)
         maze.generated_path = True
-        maze_stats_to_txt(configs, maze, x)
+        maze_stats_to_txt(configs, maze, maze.path)
     return maze

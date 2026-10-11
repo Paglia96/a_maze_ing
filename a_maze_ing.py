@@ -37,7 +37,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     maze: Maze = generate_and_print_matrix(configs, stdscr)
     while ch := stdscr.getch():
         if ch == -1:
-            curses.napms(10)
+            stdscr.timeout(-1)
             continue
         if ch == ord("q"):
             break

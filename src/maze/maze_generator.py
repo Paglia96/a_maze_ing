@@ -43,6 +43,7 @@ class MazeGenerator:
         self.removed_walls: list[tuple[Cell, Wall]] = []
         self.generated_path: bool = False
         self.generated: bool = False
+        self.path: str = ""
         self.ft_logo = (
             [0, 0], [1, 0], [2, 0], [2, 1], [2, 2], [3, 2], [4, 2],
             [0, 4], [0, 5], [0, 6], [1, 6], [2, 4], [2, 5],
@@ -553,4 +554,5 @@ class MazeGenerator:
         if not exploring and not found_exit:
             return ""
         path.reverse()
+        self.path = "".join(path)
         return "".join(path)

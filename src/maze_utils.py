@@ -1,12 +1,11 @@
 from .parser import Configs, extend_configs
 from .maze import MazeGenerator
-from typing import cast
+from typing import cast, Callable
 from time import sleep
 import curses
 from itertools import chain
 
 Maze = MazeGenerator
-
 
 
 def restore_perfect_maze(
@@ -45,6 +44,7 @@ def perfect_to_imperfect(
         cast(int, configs['VERTICAL_OFFSET']),
         cast(float, configs['SECONDS'])
         )
+
 
 def maze_stats_to_txt(
         configs: Configs, maze: Maze, path: str) -> None:
@@ -88,6 +88,7 @@ def refresh_and_sleep(
     """
     stdscr.refresh()
     sleep(seconds)
+
 
 def print_matrix(
         configs: Configs, maze: Maze, stdscr: curses.window
@@ -223,6 +224,7 @@ def generate_maze(
         maze.generated = True
         if not configs["PERFECT"]:
             perfect_to_imperfect(configs, maze, stdscr)
+        maze_stats_to_txt(configs, maze, maze.path)
     refresh_and_sleep(0, stdscr)
 
 

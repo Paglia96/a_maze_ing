@@ -1,10 +1,27 @@
 from argparse import ArgumentParser
 from typing import cast
-
+import curses
 
 ConfigValue = str | int | bool | tuple[int, int] | float
 Configs = dict[str, ConfigValue]
 
+def extend_configs(
+        configs: Configs, stdscr: curses.window) -> None:
+    """Update the screen size and maze offsets.
+
+    Args:
+        configs: The maze configuration.
+        stdscr: The curses window.
+    """
+    width = cast(int, configs['WIDTH'])
+    height = cast(int, configs['HEIGHT'])
+    n_rows, n_cols = stdscr.getmaxyx()
+    horizontal_offset: int = (n_cols - (height * 4 + 1)) // 2
+    vertical_offset: int = (n_rows - (width * 2 + 1)) // 2
+    configs['ROWS'] = n_rows
+    configs['COLS'] = n_cols
+    configs['HORIZONTAL_OFFSET'] = horizontal_offset
+    configs['VERTICAL_OFFSET'] = vertical_offset
 
 def values_check(configs: Configs) -> None:
     """Convert and validate the configuration values.

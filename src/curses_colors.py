@@ -1,9 +1,8 @@
 import curses
 from collections.abc import Generator
 
-def color_generator(
-        color_pairs: list[int]
-        ) -> Generator[int, None, None]:
+
+def color_generator(color_pairs: list[int]) -> Generator[int, None, None]:
     """Generate color pairs in a continuous cycle.
 
     Args:
@@ -13,8 +12,10 @@ def color_generator(
         The next color pair.
     """
     from itertools import cycle
+
     for color_pair in cycle(color_pairs):
         yield color_pair
+
 
 def init_colors() -> list[int]:
     """Initialize curses color pairs.

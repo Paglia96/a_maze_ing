@@ -1,21 +1,19 @@
 import curses
 from typing import cast
-from itertools import chain
-from collections.abc import Generator, Callable
-from time import sleep
-import random
+from collections.abc import Generator
 from src import (
-        MazeGenerator,
-        Configs,
-        config_parser,
-        init_colors,
-        color_generator,
-        extend_configs,
-        generate_and_print_matrix,
-        ch_parsing
-        )
+    MazeGenerator,
+    Configs,
+    config_parser,
+    init_colors,
+    color_generator,
+    extend_configs,
+    generate_and_print_matrix,
+    ch_parsing,
+)
 
 Maze = MazeGenerator
+
 
 def a_maze_ing(stdscr: curses.window) -> bool:
     """Run the interactive maze program.
@@ -27,13 +25,13 @@ def a_maze_ing(stdscr: curses.window) -> bool:
         True if a restart is requested, otherwise False.
     """
     configs: Configs = config_parser()
-    color_pair: Generator[int, None, None] = color_generator(init_colors()) 
-    configs['PALETTE'] = next(color_pair)
-    configs['SECONDS'] = 1
-    curses.curs_set(0) # nascondi il cursore
+    color_pair: Generator[int, None, None] = color_generator(init_colors())
+    configs["PALETTE"] = next(color_pair)
+    configs["SECONDS"] = 1
+    curses.curs_set(0)  # nascondi il cursore
     stdscr.nodelay(True)  # non blocca su getch()
     extend_configs(configs, stdscr)
-    stdscr.bkgd(' ', cast(int, configs['PALETTE']))
+    stdscr.bkgd(" ", cast(int, configs["PALETTE"]))
     maze: Maze = generate_and_print_matrix(configs, stdscr)
     while ch := stdscr.getch():
         if ch == -1:
@@ -47,10 +45,9 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     return False
 
 
-
-
 def main(stdscr: curses.window) -> None:
-    """Loops a_maze_ing for every time the user asks to reload starting configuration.
+    """Loops a_maze_ing for every time the user asks to
+    reload starting configuration.
 
     Args:
         stdscr: curses standard screen
@@ -66,7 +63,8 @@ if __name__ == "__main__":
         curses.wrapper(main)
     except SystemExit:  # ArgumentParser
         print(
-            f"Invalid number of arguments, only one filename required", file=sys.stderr
+            "Invalid number of arguments, only one filename required",
+            file=sys.stderr
         )
     except curses.error:
         print(

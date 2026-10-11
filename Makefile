@@ -50,7 +50,7 @@ lint-strict:
 	mypy . --strict
 
 auto-lint:
-	ruff .
+	ruff format .
 	black .
 
 .PHONY: install install-dev build run debug clean lint lint-strict auto-lint

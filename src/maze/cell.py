@@ -19,11 +19,10 @@ class Wall(IntFlag):
     * ``0x3`` (3): the upper and left walls are closed.
     """
 
-    UP = 1 # 0001
-    RIGHT = 2 # 0010
-    DOWN = 4 # 0100
-    LEFT = 8 # 1000
-
+    UP = 1  # 0001
+    RIGHT = 2  # 0010
+    DOWN = 4  # 0100
+    LEFT = 8  # 1000
 
     def opposite_wall(self) -> Wall:
         """Return the opposite wall.
@@ -65,13 +64,12 @@ class Cell:
         parent: The previous cell in the path.
         direction: The direction used to reach the cell.
     """
+
     x: int
     y: int
     width: int
     height: int
-    walls: "Wall" = field(
-            default_factory=lambda: Wall(0xF)
-            )
+    walls: "Wall" = field(default_factory=lambda: Wall(0xF))
     is_visited: bool = False
     ft_logo: bool = False
     entry: bool = False
@@ -82,8 +80,7 @@ class Cell:
     mouse_tracks: ClassVar[int] = 0
     direction: str = ""
 
-    def adjacent_cell(self, wall: str) -> tuple[
-                            int, int]:
+    def adjacent_cell(self, wall: str) -> tuple[int, int]:
         """Get the coordinates of the adjacent cell.
 
         Args:
@@ -96,42 +93,39 @@ class Cell:
             ValueError: If the wall direction is invalid.
         """
         match wall:
-            case 'UP':
+            case "UP":
                 return (self.x - 1, self.y)
-            case 'LEFT':
+            case "LEFT":
                 return (self.x, self.y - 1)
-            case 'RIGHT':
+            case "RIGHT":
                 return (self.x, self.y + 1)
-            case 'DOWN':
+            case "DOWN":
                 return (self.x + 1, self.y)
         raise ValueError(f"Invalid wall: {wall}")
 
-
     def remove_wall(self, wall: "Wall") -> None:
         """Remove the given wall from the cell.
-        
+
         Args:
             wall: The wall to remove
         """
         self.walls &= ~wall
 
-
     def add_wall(self, wall: "Wall") -> None:
-        """ Add the given wall to the cell
+        """Add the given wall to the cell
 
         Args:
             wall: The wall to add
         """
         self.walls |= wall
 
-
     def print_base(
-            self,
-            stdscr: c.window,
-            palette: int,
-            horizontal_offset: int,
-            vertical_offset: int
-            ) -> None:
+        self,
+        stdscr: c.window,
+        palette: int,
+        horizontal_offset: int,
+        vertical_offset: int,
+    ) -> None:
         """Draw the fixed borders of the cell.
 
         Args:
@@ -143,37 +137,37 @@ class Cell:
         row = (self.x * 2) + vertical_offset
         col = (self.y * 4) + horizontal_offset
         if not self.x:
-            stdscr.addstr(row, col + 1, '━' * 3, palette)
+            stdscr.addstr(row, col + 1, "━" * 3, palette)
             if self.y == self.height - 1:
-                stdscr.addch(row, col + 4, '┓', palette)
+                stdscr.addch(row, col + 4, "┓", palette)
             else:
-                stdscr.addch(row, col + 4, '┳', palette)
+                stdscr.addch(row, col + 4, "┳", palette)
         if not self.y:
-            stdscr.addch(row, col, '┣', palette)
-            stdscr.addch(row + 1, col, '┃', palette)
+            stdscr.addch(row, col, "┣", palette)
+            stdscr.addch(row + 1, col, "┃", palette)
             if self.x == 0:
-                stdscr.addch(row, col, '┏', palette)
-            elif self.x == self.width - 1: # ultima casella in basso a sx
-                stdscr.addch(row + 2, col, '┗', palette)
+                stdscr.addch(row, col, "┏", palette)
+            elif self.x == self.width - 1:  # ultima casella in basso a sx
+                stdscr.addch(row + 2, col, "┗", palette)
         if self.y == self.height - 1:
-            stdscr.addch(row + 2, col + 4, '┫', palette)
-            stdscr.addch(row + 1, col + 4, '┃', palette)
+            stdscr.addch(row + 2, col + 4, "┫", palette)
+            stdscr.addch(row + 1, col + 4, "┃", palette)
         if self.y != self.height - 1:
-            stdscr.addch(row + 2, col + 4, '╋', palette)
+            stdscr.addch(row + 2, col + 4, "╋", palette)
         if self.x == self.width - 1:
-            stdscr.addch(row + 2, col + 4, '┻', palette)
-            stdscr.addstr(row + 2, col + 1, '━' * 3, palette)
+            stdscr.addch(row + 2, col + 4, "┻", palette)
+            stdscr.addstr(row + 2, col + 1, "━" * 3, palette)
             if self.y == self.height - 1:
-                stdscr.addch(row + 2, col + 4, '┛', palette)
+                stdscr.addch(row + 2, col + 4, "┛", palette)
 
     def print_self(
-            self,
-            stdscr: c.window,
-            palette: int,
-            horizontal_offset: int,
-            vertical_offset: int,
-            hide: bool = False
-            ) -> None:
+        self,
+        stdscr: c.window,
+        palette: int,
+        horizontal_offset: int,
+        vertical_offset: int,
+        hide: bool = False,
+    ) -> None:
         """Print walls or spaces if there is no walls.
                 It prints:
                     -right and down of the cell;
@@ -187,36 +181,28 @@ class Cell:
                 the y axys of the labirinth centered on the stdscr
 
         Returns:
-            None 
+            None
         """
         row = (self.x * 2) + vertical_offset
         col = (self.y * 4) + horizontal_offset
         stdscr.addstr(
-            row + 2,
-            col + 1,
-            '━' * 3 if self.walls & Wall.DOWN else '   ',
-            palette
+            row + 2, col + 1, "━" * 3 if self.walls & Wall.DOWN else "   ", palette
         )
-        stdscr.addch(
-            row + 1,
-            col + 4,
-            '┃' if self.walls & Wall.RIGHT else ' ',
-            palette
-        )
+        stdscr.addch(row + 1, col + 4, "┃" if self.walls & Wall.RIGHT else " ", palette)
         if self.ft_logo:
-            stdscr.addstr(row + 1, col + 1, 'X' * 3, palette)
+            stdscr.addstr(row + 1, col + 1, "X" * 3, palette)
         elif self.entry:
-            stdscr.addch(row + 1, col + 1, '🐭', palette)
+            stdscr.addch(row + 1, col + 1, "🐭", palette)
         elif self.end:
-            stdscr.addch(row + 1, col + 1, '🧀', palette)
+            stdscr.addch(row + 1, col + 1, "🧀", palette)
         elif self.is_path:
             if not hide:
-                stdscr.addstr(row + 1, col + 1, '   ', palette | c.A_REVERSE)
+                stdscr.addstr(row + 1, col + 1, "   ", palette | c.A_REVERSE)
             else:
-                stdscr.addstr(row + 1, col + 1, '   ', palette)
-            #x, y = self.adjacent_cell(Wall.UP.name)
-            #stdscr.addstr(0, 0, f'{self.x}, {self.y} | {self.parent.x}, {self.parent.y} | {x}, {y}', palette | c.A_REVERSE)
-            #if not (self.walls & Wall.DOWN) and self.parent and self.parent.x == x and self.parent.y == y:
+                stdscr.addstr(row + 1, col + 1, "   ", palette)
+            # x, y = self.adjacent_cell(Wall.UP.name)
+            # stdscr.addstr(0, 0, f'{self.x}, {self.y} | {self.parent.x}, {self.parent.y} | {x}, {y}', palette | c.A_REVERSE)
+            # if not (self.walls & Wall.DOWN) and self.parent and self.parent.x == x and self.parent.y == y:
             #    stdscr.addstr(row + 2, col + 2, ' ', palette | c.A_REVERSE)
         else:
-            stdscr.addstr(row + 1, col + 1, '   ', palette)
+            stdscr.addstr(row + 1, col + 1, "   ", palette)

@@ -8,9 +8,7 @@ from itertools import chain
 Maze = MazeGenerator
 
 
-def restore_perfect_maze(
-        configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> None:
+def restore_perfect_maze(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
     """Restore the walls of the perfect maze.
 
     Args:
@@ -20,16 +18,14 @@ def restore_perfect_maze(
     """
     maze.restore_walls(
         stdscr,
-        cast(int, configs['PALETTE']),
-        cast(int, configs['HORIZONTAL_OFFSET']),
-        cast(int, configs['VERTICAL_OFFSET']),
-        cast(float, configs['SECONDS'])
-        )
+        cast(int, configs["PALETTE"]),
+        cast(int, configs["HORIZONTAL_OFFSET"]),
+        cast(int, configs["VERTICAL_OFFSET"]),
+        cast(float, configs["SECONDS"]),
+    )
 
 
-def perfect_to_imperfect(
-        configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> None:
+def perfect_to_imperfect(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
     """Remove dead ends to make the maze non-perfect.
 
     Args:
@@ -39,15 +35,14 @@ def perfect_to_imperfect(
     """
     maze.remove_dead_ends(
         stdscr,
-        cast(int, configs['PALETTE']),
-        cast(int, configs['HORIZONTAL_OFFSET']),
-        cast(int, configs['VERTICAL_OFFSET']),
-        cast(float, configs['SECONDS'])
-        )
+        cast(int, configs["PALETTE"]),
+        cast(int, configs["HORIZONTAL_OFFSET"]),
+        cast(int, configs["VERTICAL_OFFSET"]),
+        cast(float, configs["SECONDS"]),
+    )
 
 
-def maze_stats_to_txt(
-        configs: Configs, maze: Maze, path: str) -> None:
+def maze_stats_to_txt(configs: Configs, maze: Maze, path: str) -> None:
     """Save the maze and its solution to a text file.
 
     Args:
@@ -55,31 +50,21 @@ def maze_stats_to_txt(
         maze: The maze to save.
         path: The solution path.
     """
-    width = cast(int, configs['WIDTH'])
-    height = cast(int, configs['HEIGHT'])
+    width = cast(int, configs["WIDTH"])
+    height = cast(int, configs["HEIGHT"])
 
-    en = cast(tuple[int, int], configs['ENTRY'])
-    ex = cast(tuple[int, int], configs['EXIT'])
-    
+    en = cast(tuple[int, int], configs["ENTRY"])
+    ex = cast(tuple[int, int], configs["EXIT"])
 
-    with open(cast(str, configs['OUTPUT_FILE']), 'w') as f:
+    with open(cast(str, configs["OUTPUT_FILE"]), "w") as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
-        f.write(
-                f"{en[0]}, "
-                f"{en[1]}"
-                ' ' * 5 + '# entry   (x, y)'
-                )
-        f.write(
-                f"{ex[0]}, "
-                f"{ex[1]}"
-                ' ' * 5 + '# exit   (x, y)'
-                )
+        f.write(f"{en[0]}, {en[1]} " * 5 + "# entry   (x, y)")
+        f.write(f"{ex[0]}, {ex[1]} " * 5 + "# exit   (x, y)")
         f.write(f"\n{path}\n")
 
-def refresh_and_sleep(
-        seconds: float, stdscr: curses.window
-        ) -> None:
+
+def refresh_and_sleep(seconds: float, stdscr: curses.window) -> None:
     """Refresh the screen and wait.
 
     Args:
@@ -90,9 +75,7 @@ def refresh_and_sleep(
     sleep(seconds)
 
 
-def print_matrix(
-        configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> None:
+def print_matrix(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
     """Draw the maze matrix on the screen.
 
     Args:
@@ -100,15 +83,15 @@ def print_matrix(
         maze: The maze to draw.
         stdscr: The curses window.
     """
+
     def print_step(
-            configs: Configs,
-            maze: Maze,
-            stdscr: curses.window,
-            print_method: Callable[
-                [MazeGenerator.Cell, curses.window, int, int, int],
-                None
-            ]
-            ) -> None:
+        configs: Configs,
+        maze: Maze,
+        stdscr: curses.window,
+        print_method: Callable[
+            [MazeGenerator.Cell, curses.window, int, int, int], None
+        ],
+    ) -> None:
         """Draw all cells using the given method.
 
         Args:
@@ -117,9 +100,9 @@ def print_matrix(
             stdscr: The curses window.
             print_method: The method used to draw each cell.
         """
-        palette = cast(int, configs['PALETTE'])
-        horizontal_offset = cast(int, configs['HORIZONTAL_OFFSET'])
-        vertical_offset = cast(int, configs['VERTICAL_OFFSET'])
+        palette = cast(int, configs["PALETTE"])
+        horizontal_offset = cast(int, configs["HORIZONTAL_OFFSET"])
+        vertical_offset = cast(int, configs["VERTICAL_OFFSET"])
 
         for cell in chain.from_iterable(maze.get_maze()):
             print_method(
@@ -128,36 +111,34 @@ def print_matrix(
                 palette,
                 horizontal_offset,
                 vertical_offset,
-                )
+            )
         refresh_and_sleep(0.2, stdscr)
 
     for print_method in [MazeGenerator.Cell.print_base, MazeGenerator.Cell.print_self]:
         print_step(configs, maze, stdscr, print_method)
     refresh_and_sleep(0, stdscr)
 
-def print_legend(
-        stdscr: curses.window, configs: Configs) -> None:
+
+def print_legend(stdscr: curses.window, configs: Configs) -> None:
     """Display the commands and current settings.
 
     Args:
         stdscr: The curses window.
         configs: The maze configuration.
     """
-    width = cast(int, configs['WIDTH'])
-    rows = cast(int, configs['ROWS'])
-    cols = cast(int, configs['COLS'])
+    width = cast(int, configs["WIDTH"])
+    rows = cast(int, configs["ROWS"])
+    cols = cast(int, configs["COLS"])
     amazing = " A_MAZE_ING project from ccrucian and gipaglie "
     legends = [
-            'm = generate maze | l = matrix refresh | q = quit | r = reset',
-            "n = pathfinder | e = new random entry-exit",
-            f"c = color palette | k = Perfect: {configs['PERFECT']}",
-            "g = generation algorithm "
-            f"(current: {configs['GEN_ALGORITHM']})",
-            "p = pathfinder algorithm "
-            f"(current: {configs['SOLVING_ALGORITHM']})",
-            "Incrementable/Decrementable options (+/- after pressing option):",
-            "w = width | h = height | s = seed | t = speed",
-            ]
+        "m = generate maze | l = matrix refresh | q = quit | r = reset",
+        "n = pathfinder | e = new random entry-exit",
+        f"c = color palette | k = Perfect: {configs['PERFECT']}",
+        f"g = generation algorithm (current: {configs['GEN_ALGORITHM']})",
+        f"p = pathfinder algorithm (current: {configs['SOLVING_ALGORITHM']})",
+        "Incrementable/Decrementable options (+/- after pressing option):",
+        "w = width | h = height | s = seed | t = speed",
+    ]
 
     maze_height = width * 2 + 1
     maze_top = (rows - maze_height) // 2
@@ -178,9 +159,7 @@ def print_legend(
     refresh_and_sleep(0, stdscr)
 
 
-def generate_and_print_matrix(
-        configs: Configs, stdscr: curses.window
-        ) -> Maze:
+def generate_and_print_matrix(configs: Configs, stdscr: curses.window) -> Maze:
     """Create and display a new maze matrix.
 
     Args:
@@ -194,11 +173,11 @@ def generate_and_print_matrix(
     matrix: Maze = MazeGenerator(configs)
     print_legend(stdscr, configs)
     print_matrix(configs, matrix, stdscr)
+    maze_stats_to_txt(configs, matrix, matrix.path)
     return matrix
 
-def generate_maze(
-        configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> None:
+
+def generate_maze(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
     """Generate the maze using the selected algorithm.
 
     Args:
@@ -206,18 +185,16 @@ def generate_maze(
         maze: The maze to generate.
         stdscr: The curses window.
     """
-    args: tuple[
-        curses.window, int, int, int, int, float
-        ] = ( 
-            stdscr,
-            cast(int, configs['PALETTE']),
-            cast(int, configs['HORIZONTAL_OFFSET']),
-            cast(int, configs['VERTICAL_OFFSET']),
-            cast(int, configs['SEED']),
-            cast(float, configs['SECONDS'])
-                )
+    args: tuple[curses.window, int, int, int, int, float] = (
+        stdscr,
+        cast(int, configs["PALETTE"]),
+        cast(int, configs["HORIZONTAL_OFFSET"]),
+        cast(int, configs["VERTICAL_OFFSET"]),
+        cast(int, configs["SEED"]),
+        cast(float, configs["SECONDS"]),
+    )
     if not maze.generated:
-        if configs['GEN_ALGORITHM'] == 'prim':
+        if configs["GEN_ALGORITHM"] == "prim":
             maze.prim_algorithm(*args)
         else:
             maze.dfs(*args)
@@ -227,9 +204,7 @@ def generate_maze(
     refresh_and_sleep(0, stdscr)
 
 
-def solve_maze_path(
-        configs: Configs, maze: Maze, stdscr: curses.window
-        ) -> str:
+def solve_maze_path(configs: Configs, maze: Maze, stdscr: curses.window) -> str:
     """Find and display the shortest path.
 
     Args:
@@ -241,7 +216,7 @@ def solve_maze_path(
         The solution path.
     """
     path = ""
-    if configs['SOLVING_ALGORITHM'] == 'bfs':
+    if configs["SOLVING_ALGORITHM"] == "bfs":
         path = maze.bfs(stdscr)
     refresh_and_sleep(0, stdscr)
     return path

@@ -5,23 +5,24 @@ import curses
 ConfigValue = str | int | bool | tuple[int, int] | float
 Configs = dict[str, ConfigValue]
 
-def extend_configs(
-        configs: Configs, stdscr: curses.window) -> None:
+
+def extend_configs(configs: Configs, stdscr: curses.window) -> None:
     """Update the screen size and maze offsets.
 
     Args:
         configs: The maze configuration.
         stdscr: The curses window.
     """
-    width = cast(int, configs['WIDTH'])
-    height = cast(int, configs['HEIGHT'])
+    width = cast(int, configs["WIDTH"])
+    height = cast(int, configs["HEIGHT"])
     n_rows, n_cols = stdscr.getmaxyx()
     horizontal_offset: int = (n_cols - (height * 4 + 1)) // 2
     vertical_offset: int = (n_rows - (width * 2 + 1)) // 2
-    configs['ROWS'] = n_rows
-    configs['COLS'] = n_cols
-    configs['HORIZONTAL_OFFSET'] = horizontal_offset
-    configs['VERTICAL_OFFSET'] = vertical_offset
+    configs["ROWS"] = n_rows
+    configs["COLS"] = n_cols
+    configs["HORIZONTAL_OFFSET"] = horizontal_offset
+    configs["VERTICAL_OFFSET"] = vertical_offset
+
 
 def values_check(configs: Configs) -> None:
     """Convert and validate the configuration values.
@@ -31,33 +32,28 @@ def values_check(configs: Configs) -> None:
     Raises:
         ValueError: If a configuration value is invalid
     """
-    width, height = (configs['WIDTH'], configs['HEIGHT'])
-    configs['WIDTH'] = int(cast(str, height))
-    configs['HEIGHT'] = int(cast(str, width))
-    configs['ENTRY'] = (
-        int((v := cast(str, configs['ENTRY']).split(','))[0]),
-            int(v[1])
+    width, height = (configs["WIDTH"], configs["HEIGHT"])
+    configs["WIDTH"] = int(cast(str, height))
+    configs["HEIGHT"] = int(cast(str, width))
+    configs["ENTRY"] = (
+        int((v := cast(str, configs["ENTRY"]).split(","))[0]),
+        int(v[1]),
     )
-    configs['EXIT'] = (
-        int((v := cast(str, configs['EXIT']).split(','))[0]),
-            int(v[1])
-    )
+    configs["EXIT"] = (int((v := cast(str, configs["EXIT"]).split(","))[0]), int(v[1]))
 
     if (val := cast(str, configs["PERFECT"]).lower()) in ("true", "false"):
         configs["PERFECT"] = cast(bool, eval(val.capitalize()))
     else:
         raise ValueError("PERFECT must be true or false")
-    configs['SEED'] = (
-        int(cast(str, configs['SEED'])) if 'SEED' in configs else 1
-        )
-    if 'GEN_ALGORITHM' in configs:
-        val = cast(str, configs['GEN_ALGORITHM']).lower()
-        configs['GEN_ALGORITHM'] = val if val in ['prim', 'dfs'] else 'prim'
+    configs["SEED"] = int(cast(str, configs["SEED"])) if "SEED" in configs else 1
+    if "GEN_ALGORITHM" in configs:
+        val = cast(str, configs["GEN_ALGORITHM"]).lower()
+        configs["GEN_ALGORITHM"] = val if val in ["prim", "dfs"] else "prim"
     else:
-        configs['GEN_ALGORITHM'] = 'prim'
-    if 'SOLVING_ALGORITHM' in configs:
-        val = cast(str, configs['SOLVING_ALGORITHM']).lower()
-        configs['SOLVING_ALGORITHM'] = val if val in ['other', 'bfs'] else 'bfs'
+        configs["GEN_ALGORITHM"] = "prim"
+    if "SOLVING_ALGORITHM" in configs:
+        val = cast(str, configs["SOLVING_ALGORITHM"]).lower()
+        configs["SOLVING_ALGORITHM"] = val if val in ["other", "bfs"] else "bfs"
     else:
         configs["SOLVING_ALGORITHM"] = "bfs"
 
@@ -72,7 +68,7 @@ def file_parsing(configs: Configs, filename: str) -> None:
     Raises:
         ValueError: If the file has invalid or missing keys.
     """
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         config_keys: list[str] = [
             "WIDTH",
             "HEIGHT",
@@ -81,9 +77,7 @@ def file_parsing(configs: Configs, filename: str) -> None:
             "OUTPUT_FILE",
             "PERFECT",
         ]
-        optional_keys: list[str] = [
-            "SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"
-            ]
+        optional_keys: list[str] = ["SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"]
         for line in f:
             if line.startswith("#") or line == "\n":
                 continue
@@ -92,16 +86,14 @@ def file_parsing(configs: Configs, filename: str) -> None:
             config = line.split("=")
             if len(config) != 2:
                 raise ValueError(
-                    "The configuration file must contain one "
-                    "'KEY=VALUE' pair per line."
+                    "The configuration file must contain one 'KEY=VALUE' pair per line."
                 )
             config[0] = config[0].strip()
             config[1] = config[1][:-1].strip()  # remove ending \n e spaces
+
             def upload_key(
-                    config: list[str],
-                    configs: Configs,
-                    keys_list: list[str]
-                    ) -> None:
+                config: list[str], configs: Configs, keys_list: list[str]
+            ) -> None:
                 """Add a valid key to the configuration dictionary.
 
                 Args:
@@ -115,9 +107,7 @@ def file_parsing(configs: Configs, filename: str) -> None:
                 if (key := config[0].upper()) in keys_list:
                     keys_list.remove(key)
                     if key in configs:
-                        raise ValueError(
-                            "Just one KEY for allowed type."
-                            )
+                        raise ValueError("Just one KEY for allowed type.")
                     configs[key] = config[1]
 
             upload_key(config, configs, config_keys)
@@ -150,8 +140,8 @@ def config_parser() -> Configs:
         PermissionError: If the configuration file cannot be opened.
     """
     parser = ArgumentParser(
-            description='Receives the maze configuration settings as an argument'
-            )
+        description="Receives the maze configuration settings as an argument"
+    )
     parser.add_argument("filename", help="file path")
     filename = parser.parse_args().filename
     configs: Configs = {}

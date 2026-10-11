@@ -148,15 +148,15 @@ def print_legend(
     cols = cast(int, configs['COLS'])
     amazing = " A_MAZE_ING project from ccrucian and gipaglie "
     legends = [
-            'l = matrix refresh | q = quit | r = reset',
-            "m = generate maze | d = speed-- | i = speed++",
+            'm = generate maze | l = matrix refresh | q = quit | r = reset',
             "n = pathfinder | e = new random entry-exit",
+            f"c = color palette | k = Perfect: {configs['PERFECT']}",
             "g = generation algorithm "
             f"(current: {configs['GEN_ALGORITHM']})",
             "p = pathfinder algorithm "
             f"(current: {configs['SOLVING_ALGORITHM']})",
-            f"k = Perfect: {configs['PERFECT']}",
-            "c = color palette | s = change seed | w = width++ | h = height++",
+            "Incrementable/Decrementable options (+/- after pressing option):",
+            "w = width | h = height | s = seed | t = speed",
             ]
 
     maze_height = width * 2 + 1

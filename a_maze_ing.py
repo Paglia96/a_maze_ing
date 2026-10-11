@@ -10,7 +10,7 @@ from src import (
         extend_configs,
         generate_and_print_matrix,
         ch_parsing,
-        maze_utils
+        maze_stats_to_txt
         )
 
 Maze = MazeGenerator
@@ -33,7 +33,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     extend_configs(configs, stdscr)
     stdscr.bkgd(' ', cast(int, configs['PALETTE']))
     maze: Maze = generate_and_print_matrix(configs, stdscr)
-   # maze_utils.maze_stats_to_txt(configs, maze, maze.path)
+   # maze_stats_to_txt(configs, maze, maze.path)
     while ch := stdscr.getch():
         if ch == -1:
             stdscr.timeout(-1)
@@ -55,15 +55,16 @@ def main(stdscr: curses.window) -> None:
     while a_maze_ing(stdscr):
         stdscr.clear()
 
-
-if __name__ == "__main__":
+def error_handling():
     import sys
 
     try:
         curses.wrapper(main)
+        return
     except SystemExit:  # ArgumentParser
         print(
-            f"Invalid number of arguments, only one filename required", file=sys.stderr
+            f"Invalid number of arguments, only one filename required",
+            file=sys.stderr
         )
     except curses.error:
         print(
@@ -75,12 +76,16 @@ if __name__ == "__main__":
             "-decrementing the config file variables WIDTH and HEIGHT",
             file=sys.stderr,
         )
-        sys.exit(1)
     except IndexError:
         print("Entry and exit must be inside the maze", file=sys.stderr)
+    except AssertionError:
+        print("Maze can't have less than 2 cells", file=sys.stderr)
     except Exception as e:
         print(e, file=sys.stderr)
         import traceback  # da usare solo in development
 
         traceback.print_exc()
-        raise SystemExit(1)
+    sys.exit(1)
+
+if __name__ == "__main__":
+    error_handling()

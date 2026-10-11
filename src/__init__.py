@@ -4,6 +4,7 @@ from .maze import MazeGenerator
 from .maze_utils import (
         MazeGenerator,
         generate_and_print_matrix,
+        maze_stats_to_txt,
         )
 from .user_input import ch_parsing
 
@@ -16,5 +17,6 @@ __all__ = [
         'extend_configs',
         'generate_and_print_matrix',
         'ch_parsing',
+        'maze_stats_to_txt',
         ]
 

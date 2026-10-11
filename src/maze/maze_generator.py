@@ -59,6 +59,7 @@ class MazeGenerator:
                 )
 
         self.maze: list[list[Cell]] = []
+        cell_counter: int = 0
         for x in range(self.width):
             rows: list[Cell] = []
             for y in range(self.height):
@@ -76,7 +77,9 @@ class MazeGenerator:
                         x, y, self.width, self.height,
                         ft_logo=False
                         ))
+                cell_counter += 1
             self.maze.append(rows)
+        assert cell_counter >= 2
         for x, y in (self.entry, self.exit):
             if self.maze[x][y].ft_logo:
                 raise ValueError(

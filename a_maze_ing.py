@@ -3,7 +3,7 @@ from typing import cast
 from itertools import chain, cycle
 from collections.abc import Generator, Callable
 from time import sleep
-from random import randint
+import random
 from src import MazeGenerator, Configs, config_parser, init_colors
 
 Maze = MazeGenerator
@@ -295,10 +295,6 @@ def ch_parsing(
     elif ch == ord('c'):
         configs['PALETTE'] = next(color_pair)
         stdscr.bkgd(' ', cast(int, configs['PALETTE']))
-    elif ch == ord('n'):
-        x = solve_maze_path(configs, maze, stdscr)
-        maze.generated_path = True
-        maze_stats_to_txt(configs, maze, x)
     elif ch == ord('s'):
         configs['SEED'] = cast(int, configs['SEED']) + 1
         stdscr.clear()
@@ -310,18 +306,19 @@ def ch_parsing(
     elif ch == ord('e'):
         valid_value: bool = False
         while not valid_value:
+            rng = random.Random()
             for value in ('ENTRY', 'EXIT'):
                 configs[value] = (
-                        randint(0, configs['WIDTH'] - 1),
-                        randint(0, configs['HEIGHT'] - 1)
+                        rng.randint(0, configs['WIDTH'] - 1),
+                        rng.randint(0, configs['HEIGHT'] - 1)
                         )
             try:
                 stdscr.clear()
-                stdscr.addstr(5, 5, f"{configs['ENTRY']},{configs['EXIT']}", configs['PALETTE'])
                 maze = generate_and_print_matrix(configs, stdscr)
                 maze.generated_path = False
                 generate_maze(configs, maze, stdscr)
                 valid_value = True
+                ch = ord('n')
             except ValueError:
                 pass
     elif ch == ord('i'):
@@ -355,6 +352,10 @@ def ch_parsing(
         return generate_and_print_matrix(configs, stdscr)
     elif ch == ord("m"):
         generate_maze(configs, maze, stdscr)
+    elif ch == ord('n'):
+        x = solve_maze_path(configs, maze, stdscr)
+        maze.generated_path = True
+        maze_stats_to_txt(configs, maze, x)
     return maze
 
 

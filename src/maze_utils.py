@@ -194,6 +194,7 @@ def generate_and_print_matrix(
     matrix: Maze = MazeGenerator(configs)
     print_legend(stdscr, configs)
     print_matrix(configs, matrix, stdscr)
+    maze_stats_to_txt(configs, matrix, matrix.path)
     return matrix
 
 def generate_maze(

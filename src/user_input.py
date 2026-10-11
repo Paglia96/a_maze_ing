@@ -116,7 +116,7 @@ def ch_parsing(
     if ch == ord("l"):
         stdscr.clear()
         maze.generated_path = False
-       # maze_stats_to_txt(configs, maze, maze.path)
+        #maze_stats_to_txt(configs, maze, maze.path)
         return generate_and_print_matrix(configs, stdscr)
     elif ch == ord("m"):
         generate_maze(configs, maze, stdscr)

@@ -65,16 +65,16 @@ def maze_stats_to_txt(
     with open(cast(str, configs['OUTPUT_FILE']), 'w') as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
-        #f.write(
-        #        f"{en[0]}, "
-        #        f"{en[1]}"
-        #        ' ' * 5 + '# entry   (x, y)'
-        #        )
-        #f.write(
-        #        f"{ex[0]}, "
-        #        f"{ex[1]}"
-        #        ' ' * 5 + '# exit   (x, y)'
-        #        )
+        f.write(
+                f"{en[0]}, "
+                f"{en[1]}"
+                ' ' * 5 + '# entry   (x, y)'
+                )
+        f.write(
+                f"{ex[0]}, "
+                f"{ex[1]}"
+                ' ' * 5 + '# exit   (x, y)'
+                )
         f.write(f"\n{path}\n")
 
 def refresh_and_sleep(
@@ -224,7 +224,6 @@ def generate_maze(
         maze.generated = True
         if not configs["PERFECT"]:
             perfect_to_imperfect(configs, maze, stdscr)
-        maze_stats_to_txt(configs, maze, maze.path)
     refresh_and_sleep(0, stdscr)
 
 

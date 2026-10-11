@@ -1,9 +1,6 @@
 import curses
 from typing import cast
-from itertools import chain
-from collections.abc import Generator, Callable
-from time import sleep
-import random
+from collections.abc import Generator
 from src import (
         MazeGenerator,
         Configs,
@@ -12,7 +9,8 @@ from src import (
         color_generator,
         extend_configs,
         generate_and_print_matrix,
-        ch_parsing
+        ch_parsing,
+        maze_utils
         )
 
 Maze = MazeGenerator
@@ -35,6 +33,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     extend_configs(configs, stdscr)
     stdscr.bkgd(' ', cast(int, configs['PALETTE']))
     maze: Maze = generate_and_print_matrix(configs, stdscr)
+   # maze_utils.maze_stats_to_txt(configs, maze, maze.path)
     while ch := stdscr.getch():
         if ch == -1:
             stdscr.timeout(-1)
@@ -45,8 +44,6 @@ def a_maze_ing(stdscr: curses.window) -> bool:
             return True
         maze = ch_parsing(ch, maze, configs, stdscr, color_pair)
     return False
-
-
 
 
 def main(stdscr: curses.window) -> None:

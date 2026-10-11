@@ -21,6 +21,7 @@ class MazeGenerator:
         removed_walls: The walls removed in non-perfect mode
         generated_path: Whether the solution path has been generated
         generated: Wheter the maze has been generated
+        path: The curreny solution path
     """
 
     from .cell import Wall, Cell
@@ -245,15 +246,13 @@ class MazeGenerator:
     def _valid_closest_cells(
             self, cell: Cell
             ) -> list[tuple[Cell, Wall]]:
-        """Generate a maze using DFS.
+        """Find valid neighboring cells and their walls.
 
         Args:
-            stdscr: The curses window.
-            palette: The color palette.
-            horizontal_offset: The horizontal screen offset.
-            vertical_offset: The vertical screen offset.
-            seed_rand: The random seed.
-            seconds: The animation duration.
+            cell: The cell to check.
+
+        Returns:
+            A list of neighboring cells and their walls.
         """
         closest_cells = []
         for wall in self._valid_walls(cell):
@@ -537,8 +536,11 @@ class MazeGenerator:
         if found_exit:
             curr: Cell | None = exit_cell
             path: list[str] = []
+            self.path = ""
             while curr:
                 curr.is_path = True
+                if curr == entry_cell:
+                    break
                 path.append(curr.direction)
                 curr.print_self(
                     stdscr, palette,
@@ -555,4 +557,4 @@ class MazeGenerator:
             return ""
         path.reverse()
         self.path = "".join(path)
-        return "".join(path)
+        return self.path

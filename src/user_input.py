@@ -32,7 +32,7 @@ def pathfinder_option(
 ) -> None:
     solve_maze_path(configs, maze, stdscr, hide)
     maze.generated_path = True
-    maze_stats_to_txt(configs, maze, maze.path)
+    maze_stats_to_txt(configs, maze, "" if hide else maze.path)
 
 
 def random_entry_exit(configs: Configs) -> None:

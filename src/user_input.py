@@ -203,9 +203,10 @@ def ch_parsing(
         maze_generation_and_stats_to_txt(configs, maze, stdscr)
     elif ch == ord("n"):
         if not hasattr(ch_parsing, 'hide'):
-            ch_parsing.hide = True
-        ch_parsing.hide = not ch_parsing.hide
-        pathfinder_option(configs, maze, stdscr, ch_parsing.hide)
+            setattr(ch_parsing, "hide", True)
+        hide = not getattr(ch_parsing, "hide")
+        setattr(ch_parsing, "hide", hide)
+        pathfinder_option(configs, maze, stdscr, hide)
     elif ch == ord("o"):
         stdscr.clear()
     elif ch == ord("s"):

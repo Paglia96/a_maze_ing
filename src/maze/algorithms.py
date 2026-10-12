@@ -111,6 +111,7 @@ def bfs(self: "MazeGenerator", stdscr: c.window, hide: bool = False) -> str:
     from collections import deque
 
     # resetta a ogni chiamata
+    self.path = ""
     for row in self.maze:
         for cell in row:
             cell.explored = False

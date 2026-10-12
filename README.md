@@ -216,32 +216,61 @@ It can be imported by another Python project after installing the package. It ex
 - pathfinding through `bfs()`;
 - helper methods for coordinates, wall handling, and maze structure access.
 
-Basic example:
+The constructor creates a grid with all walls closed. Call a generation method before accessing the generated maze or solving it. The current API requires a `curses` window for both generation and solving, even when animation is disabled with `SECONDS=0.0`.
+
+After installing the package, the following example generates a maze and returns its cells and shortest solution path:
 
 ```python
+import curses
+
 from maze import MazeGenerator
 
-configs = {
-    "WIDTH": 9,
-    "HEIGHT": 9,
-    "ENTRY": (3, 0),
-    "EXIT": (7, 7),
-    "OUTPUT_FILE": "maze.txt",
-    "PERFECT": True,
-    "SEED": 10,
-    "GEN_ALGORITHM": "prim",
-    "SOLVING_ALGORITHM": "bfs",
-    "PALETTE": 0,
-    "HORIZONTAL_OFFSET": 0,
-    "VERTICAL_OFFSET": 0,
-    "SECONDS": 0.0,
-}
 
-maze = MazeGenerator(configs)
-matrix = maze.get_maze()
+def generate(stdscr):
+    configs = {
+        "WIDTH": 9,
+        "HEIGHT": 9,
+        "ENTRY": (0, 0),
+        "EXIT": (8, 8),
+        "PERFECT": True,
+        "SEED": 10,
+        "PALETTE": 0,
+        "HORIZONTAL_OFFSET": 1,
+        "VERTICAL_OFFSET": 1,
+        "SECONDS": 0.0,
+    }
+
+    maze = MazeGenerator(configs)
+    rows, columns = stdscr.getmaxyx()
+    if rows < maze.width * 2 + 3 or columns < maze.height * 4 + 3:
+        raise ValueError("Enlarge the terminal or reduce the maze size.")
+
+    stdscr.clear()
+    for row in maze.get_maze():
+        for cell in row:
+            cell.print_base(stdscr, 0, 1, 1)
+
+    maze.prim_algorithm(stdscr, 0, 1, 1, configs["SEED"], 0.0)
+    if not configs["PERFECT"]:
+        maze.remove_dead_ends(stdscr, 0, 1, 1, 0.0)
+
+    solution = maze.bfs(stdscr, hide=True)
+    return maze.get_maze(), solution
+
+
+matrix, solution = curses.wrapper(generate)
+wall_masks = [[int(cell.walls) for cell in row] for row in matrix]
+print("Wall masks:", wall_masks)
+print("Shortest path:", solution)
 ```
 
-The current visual generation and solving functions use `curses` for animation, so a future non-interactive reuse can import the maze data structures directly or adapt the generation calls to a different display layer.
+Change `SEED` to select another reproducible maze. To use DFS, replace the `prim_algorithm()` call with `dfs()` using the same arguments. For an imperfect maze, set `PERFECT` to `False`; the example explicitly calls `remove_dead_ends()` after generation because the generation methods do not apply this setting automatically.
+
+For direct use of the current class, `WIDTH` counts matrix rows, `HEIGHT` counts columns, and `ENTRY` and `EXIT` use `(row, column)` indices. These internal conventions differ from the configuration file's intended `(x, y)` coordinates. When changing the dimensions, update the exit indices and keep both endpoints outside the closed `42` cells. The example requires a terminal of at least 21 rows and 39 columns.
+
+`get_maze()` returns the cell matrix. Each `Cell.walls` is a bitmask with the North, East, South, and West bits described in the output format section; `wall_masks` above converts these masks to integers. `bfs()` returns the shortest path as a string of `N`, `E`, `S`, and `W` moves and also stores it in `maze.path`. Its `hide=True` argument hides the path while preserving the returned solution. These direct calls do not write an output file.
+
+`curses.wrapper()` initializes the terminal and restores it before the results are printed. A future application using another display layer would need to adapt the drawing calls in the current generation and solving methods.
 
 The package metadata is defined in `pyproject.toml` as `mazegen`. A distributable package can be built with:
 

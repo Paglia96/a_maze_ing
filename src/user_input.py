@@ -107,7 +107,7 @@ def refresh_option(
         try:
             maze = generate_and_print_matrix(configs, stdscr)
             valid_entry_exit = True
-        except ValueError, IndexError:
+        except (ValueError, IndexError):
             random_entry_exit(configs)
     return maze
 

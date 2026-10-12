@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 
 def prim_algorithm(
-    self: MazeGenerator,
+    self: "MazeGenerator",
     stdscr: c.window,
     palette: int,
     horizontal_offset: int,
@@ -56,7 +56,7 @@ def prim_algorithm(
 
 
 def dfs(
-    self: MazeGenerator,
+    self: "MazeGenerator",
     stdscr: c.window,
     palette: int,
     horizontal_offset: int,
@@ -99,7 +99,7 @@ def dfs(
             )
 
 
-def bfs(self: MazeGenerator, stdscr: c.window, hide: bool = False) -> str:
+def bfs(self: "MazeGenerator", stdscr: c.window, hide: bool = False) -> str:
     """Find the shortest path using BFS.
 
     Args:

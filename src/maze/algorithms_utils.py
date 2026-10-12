@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from .maze_generator import MazeGenerator
 
 
-def _random_valid_starting_cell(self: MazeGenerator) -> Cell:
+def _random_valid_starting_cell(self: "MazeGenerator") -> Cell:
     """Choose a random cell outside the logo.
 
     Returns:
@@ -20,7 +20,7 @@ def _random_valid_starting_cell(self: MazeGenerator) -> Cell:
     return cell
 
 
-def _valid_walls(self: MazeGenerator, cell: Cell) -> list[Wall]:
+def _valid_walls(self: "MazeGenerator", cell: Cell) -> list[Wall]:
     """Find closed walls leading to unvisited cells.
 
     Args:
@@ -61,7 +61,7 @@ def _valid_walls(self: MazeGenerator, cell: Cell) -> list[Wall]:
 
 
 def _print_animation(
-    self: MazeGenerator,
+    self: "MazeGenerator",
     current: Cell,
     adjacent: Cell,
     stdscr: c.window,
@@ -89,7 +89,7 @@ def _print_animation(
 
 
 def _valid_closest_cells(
-        self: MazeGenerator, cell: Cell
+        self: "MazeGenerator", cell: Cell
 ) -> list[tuple[Cell, Wall]]:
     """Find valid neighboring cells and their walls.
 
@@ -107,7 +107,7 @@ def _valid_closest_cells(
     return closest_cells
 
 
-def open_walls(self: MazeGenerator, cell: Cell) -> int:
+def open_walls(self: "MazeGenerator", cell: Cell) -> int:
     """Count the open walls of a cell.
 
     Args:
@@ -124,7 +124,7 @@ def open_walls(self: MazeGenerator, cell: Cell) -> int:
 
 
 def closed_valid_walls(
-        self: MazeGenerator, cell: Cell
+        self: "MazeGenerator", cell: Cell
 ) -> list[tuple[Wall, Cell]]:
     """Find breakable walls and their neighboring cells.
 
@@ -152,7 +152,7 @@ def closed_valid_walls(
 
 
 def remove_dead_ends(
-    self: MazeGenerator,
+    self: "MazeGenerator",
     stdscr: c.window,
     palette: int,
     horizontal_offset: int,
@@ -201,7 +201,7 @@ def remove_dead_ends(
 
 
 def restore_walls(
-    self: MazeGenerator,
+    self: "MazeGenerator",
     stdscr: c.window,
     palette: int,
     horizontal_offset: int,
@@ -231,7 +231,7 @@ def restore_walls(
 
 
 def coordinates_to_cell(
-        self: MazeGenerator,
+        self: "MazeGenerator",
         config_cell: tuple[int, int],
         node_type: str
         ) -> Cell:
@@ -250,7 +250,7 @@ def coordinates_to_cell(
     return cell
 
 
-def give_direction(self: MazeGenerator, wall_name: str) -> str:
+def give_direction(self: "MazeGenerator", wall_name: str) -> str:
     """Convert a wall name into a direction.
 
     Args:

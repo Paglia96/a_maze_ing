@@ -1,5 +1,5 @@
 from .parser import Configs, extend_configs
-from .maze import MazeGenerator
+from .maze import MazeGenerator, Cell
 from typing import cast, Callable
 from time import sleep
 import curses
@@ -90,7 +90,7 @@ def print_matrix(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
         maze: Maze,
         stdscr: curses.window,
         print_method: Callable[
-            [Maze.Cell, curses.window, int, int, int], None
+            [Cell, curses.window, int, int, int], None
         ],
     ) -> None:
         """Draw all cells using the given method.

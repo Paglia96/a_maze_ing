@@ -1,4 +1,4 @@
-from .maze_generator import Wall, Cell
+from .cell import Wall, Cell
 from random import seed, choice
 from time import sleep
 from typing import cast, TYPE_CHECKING
@@ -149,7 +149,7 @@ def bfs(self: MazeGenerator, stdscr: c.window) -> str:
             if not (current.walls & wall):
                 if wall.name is None:
                     continue
-                x, y = current.adjacent_cell(cast(str, wall.name))
+                x, y = current.adjacent_cell(wall.name)
                 adjacent = self[x][y]
                 if not adjacent.explored:
                     adjacent.explored = True

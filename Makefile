@@ -47,8 +47,9 @@ lint:
 	@mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	flake8 .
-	mypy . --strict
+	@clear
+	@flake8 .
+	@mypy . --strict
 
 auto-lint:
 	ruff format .

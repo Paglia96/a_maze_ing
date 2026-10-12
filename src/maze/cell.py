@@ -185,10 +185,14 @@ class Cell:
         """
         row = (self.x * 2) + vertical_offset
         col = (self.y * 4) + horizontal_offset
-        stdscr.addstr(
-            row + 2, col + 1, "━" * 3 if self.walls & Wall.DOWN else "   ", palette
-        )
-        stdscr.addch(row + 1, col + 4, "┃" if self.walls & Wall.RIGHT else " ", palette)
+        if self.walls & Wall.DOWN:
+            stdscr.addstr(row + 2, col + 1, "━" * 3, palette)
+        else:
+            stdscr.addstr(row + 2, col + 1, "   ", palette)
+        if self.walls & Wall.RIGHT:
+            stdscr.addch(row + 1, col + 4, "┃", palette)
+        else:
+            stdscr.addch(row + 1, col + 4, " ", palette)
         if self.ft_logo:
             stdscr.addstr(row + 1, col + 1, "X" * 3, palette)
         elif self.entry:
@@ -200,9 +204,5 @@ class Cell:
                 stdscr.addstr(row + 1, col + 1, "   ", palette | c.A_REVERSE)
             else:
                 stdscr.addstr(row + 1, col + 1, "   ", palette)
-            # x, y = self.adjacent_cell(Wall.UP.name)
-            # stdscr.addstr(0, 0, f'{self.x}, {self.y} | {self.parent.x}, {self.parent.y} | {x}, {y}', palette | c.A_REVERSE)
-            # if not (self.walls & Wall.DOWN) and self.parent and self.parent.x == x and self.parent.y == y:
-            #    stdscr.addstr(row + 2, col + 2, ' ', palette | c.A_REVERSE)
         else:
             stdscr.addstr(row + 1, col + 1, "   ", palette)

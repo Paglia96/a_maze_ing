@@ -39,13 +39,16 @@ def values_check(configs: Configs) -> None:
         int((v := cast(str, configs["ENTRY"]).split(","))[0]),
         int(v[1]),
     )
-    configs["EXIT"] = (int((v := cast(str, configs["EXIT"]).split(","))[0]), int(v[1]))
-
+    x, y = cast(str, configs["EXIT"]).split(",")
+    configs["EXIT"] = (int(x), int(y))
     if (val := cast(str, configs["PERFECT"]).lower()) in ("true", "false"):
         configs["PERFECT"] = cast(bool, eval(val.capitalize()))
     else:
         raise ValueError("PERFECT must be true or false")
-    configs["SEED"] = int(cast(str, configs["SEED"])) if "SEED" in configs else 1
+    if 'SEED' in configs:
+        configs["SEED"] = int(cast(str, configs["SEED"]))
+    else:
+        configs['SEED'] = 1
     if "GEN_ALGORITHM" in configs:
         val = cast(str, configs["GEN_ALGORITHM"]).lower()
         configs["GEN_ALGORITHM"] = val if val in ["prim", "dfs"] else "prim"
@@ -53,7 +56,7 @@ def values_check(configs: Configs) -> None:
         configs["GEN_ALGORITHM"] = "prim"
     if "SOLVING_ALGORITHM" in configs:
         val = cast(str, configs["SOLVING_ALGORITHM"]).lower()
-        configs["SOLVING_ALGORITHM"] = val if val in ["other", "bfs"] else "bfs"
+        configs["SOLVING_ALGORITHM"] = val if val == "bfs" else "bfs"
     else:
         configs["SOLVING_ALGORITHM"] = "bfs"
 
@@ -70,14 +73,11 @@ def file_parsing(configs: Configs, filename: str) -> None:
     """
     with open(filename, "r") as f:
         config_keys: list[str] = [
-            "WIDTH",
-            "HEIGHT",
-            "ENTRY",
-            "EXIT",
-            "OUTPUT_FILE",
-            "PERFECT",
+            "WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"
         ]
-        optional_keys: list[str] = ["SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"]
+        optional_keys: list[str] = [
+                "SEED", "GEN_ALGORITHM", "SOLVING_ALGORITHM"
+                ]
         for line in f:
             if line.startswith("#") or line == "\n":
                 continue
@@ -86,7 +86,8 @@ def file_parsing(configs: Configs, filename: str) -> None:
             config = line.split("=")
             if len(config) != 2:
                 raise ValueError(
-                    "The configuration file must contain one 'KEY=VALUE' pair per line."
+                    "The configuration file must contain one"
+                    "'KEY=VALUE' pair per line."
                 )
             config[0] = config[0].strip()
             config[1] = config[1][:-1].strip()  # remove ending \n e spaces
@@ -124,7 +125,8 @@ def config_parser() -> Configs:
     Lines beginning with # and inline comments are ignored.
 
     Returns:
-        dict: A dictionary containing the parsed configuration values or default ones.
+        dict: A dictionary containing the parsed
+        configuration values or default ones.
             WIDTH and HEIGHT are integers.
             ENTRY and EXIT are coordinate tuples.
             OUTPUT_FILE is a string.

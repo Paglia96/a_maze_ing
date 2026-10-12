@@ -10,7 +10,7 @@ from src import (
     extend_configs,
     generate_and_print_matrix,
     ch_parsing,
-    maze_stats_to_txt,
+    refresh_option,
 )
 
 Maze = MazeGenerator
@@ -34,7 +34,7 @@ def a_maze_ing(stdscr: curses.window) -> bool:
     extend_configs(configs, stdscr)
     stdscr.bkgd(" ", cast(int, configs["PALETTE"]))
     maze: Maze = generate_and_print_matrix(configs, stdscr)
-    # maze_stats_to_txt(configs, maze, maze.path)
+    rows_cols: tuple[int, int] = stdscr.getmaxyx()
     while ch := stdscr.getch():
         if ch == -1:
             stdscr.timeout(-1)
@@ -44,11 +44,16 @@ def a_maze_ing(stdscr: curses.window) -> bool:
         elif ch == ord("r"):
             return True
         maze = ch_parsing(ch, maze, configs, stdscr, color_pair)
+        rows_cols2: tuple[int, int] = stdscr.getmaxyx()
+        if rows_cols2 != rows_cols:
+            maze = refresh_option(maze, configs, stdscr)
+        rows_cols = stdscr.getmaxyx()
     return False
 
 
 def main(stdscr: curses.window) -> None:
-    """Loops a_maze_ing for every time the user asks to reload starting configuration.
+    """Loops a_maze_ing for every time the user asks to
+    reload starting configuration.
 
     Args:
         stdscr: curses standard screen
@@ -57,15 +62,15 @@ def main(stdscr: curses.window) -> None:
         stdscr.clear()
 
 
-def error_handling():
+def error_handling() -> None:
     import sys
-
     try:
         curses.wrapper(main)
         return
     except SystemExit:  # ArgumentParser
         print(
-            f"Invalid number of arguments, only one filename required", file=sys.stderr
+            "Invalid number of arguments, only one filename required",
+            file=sys.stderr
         )
     except curses.error:
         print(
@@ -84,7 +89,6 @@ def error_handling():
     except Exception as e:
         print(e, file=sys.stderr)
         import traceback  # da usare solo in development
-
         traceback.print_exc()
     sys.exit(1)
 

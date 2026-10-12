@@ -8,7 +8,9 @@ from itertools import chain
 Maze = MazeGenerator
 
 
-def restore_perfect_maze(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
+def restore_perfect_maze(
+        configs: Configs, maze: Maze, stdscr: curses.window
+        ) -> None:
     """Restore the walls of the perfect maze.
 
     Args:
@@ -25,7 +27,9 @@ def restore_perfect_maze(configs: Configs, maze: Maze, stdscr: curses.window) ->
     )
 
 
-def perfect_to_imperfect(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
+def perfect_to_imperfect(
+        configs: Configs, maze: Maze, stdscr: curses.window
+        ) -> None:
     """Remove dead ends to make the maze non-perfect.
 
     Args:
@@ -50,17 +54,14 @@ def maze_stats_to_txt(configs: Configs, maze: Maze, path: str) -> None:
         maze: The maze to save.
         path: The solution path.
     """
-    width = cast(int, configs["WIDTH"])
-    height = cast(int, configs["HEIGHT"])
-
     en = cast(tuple[int, int], configs["ENTRY"])
     ex = cast(tuple[int, int], configs["EXIT"])
 
     with open(cast(str, configs["OUTPUT_FILE"]), "w") as f:
         for row in maze:
             f.write("".join(f"{cell.walls:x}" for cell in row) + "\n")
-        f.write(f"{en[0]}, {en[1]} " * 5 + "# entry   (x, y)")
-        f.write(f"{ex[0]}, {ex[1]} " * 5 + "# exit   (x, y)")
+        f.write(f"\n{en[0]},{en[1]}          # entry   (x, y)\n")
+        f.write(f"{ex[0]},{ex[1]}          # exit   (x, y)")
         f.write(f"\n{path}\n")
 
 
@@ -89,7 +90,7 @@ def print_matrix(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
         maze: Maze,
         stdscr: curses.window,
         print_method: Callable[
-            [MazeGenerator.Cell, curses.window, int, int, int], None
+            [Maze.Cell, curses.window, int, int, int], None
         ],
     ) -> None:
         """Draw all cells using the given method.
@@ -114,7 +115,7 @@ def print_matrix(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
             )
         refresh_and_sleep(0.2, stdscr)
 
-    for print_method in [MazeGenerator.Cell.print_base, MazeGenerator.Cell.print_self]:
+    for print_method in [Maze.Cell.print_base, Maze.Cell.print_self]:
         print_step(configs, maze, stdscr, print_method)
     refresh_and_sleep(0, stdscr)
 
@@ -204,7 +205,9 @@ def generate_maze(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
     refresh_and_sleep(0, stdscr)
 
 
-def solve_maze_path(configs: Configs, maze: Maze, stdscr: curses.window) -> str:
+def solve_maze_path(
+        configs: Configs, maze: Maze, stdscr: curses.window
+        ) -> str:
     """Find and display the shortest path.
 
     Args:

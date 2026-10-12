@@ -2,7 +2,6 @@ import curses
 from .maze import MazeGenerator
 from collections.abc import Generator
 from typing import cast
-from time import sleep
 import random
 from .maze_utils import (
     generate_maze,
@@ -20,18 +19,20 @@ Maze = MazeGenerator
 
 def maze_generation_and_stats_to_txt(
     configs: Configs, maze: Maze, stdscr: curses.window
-):
+) -> None:
     generate_maze(configs, maze, stdscr)
     maze_stats_to_txt(configs, maze, maze.path)
 
 
-def pathfinder_option(configs: Configs, maze: Maze, stdscr: curses.window):
+def pathfinder_option(
+        configs: Configs, maze: Maze, stdscr: curses.window
+) -> None:
     solve_maze_path(configs, maze, stdscr)
     maze.generated_path = True
     maze_stats_to_txt(configs, maze, maze.path)
 
 
-def random_entry_exit(configs: Congigs):
+def random_entry_exit(configs: Configs) -> None:
     """Generates two new random values for entry and exit.
     Updates the config dictionary.
 
@@ -49,7 +50,9 @@ def random_entry_exit(configs: Congigs):
         )
 
 
-def new_entry_exit_option(configs: Configs, stdscr: curses.window, maze: Maze):
+def new_entry_exit_option(
+        configs: Configs, stdscr: curses.window, maze: Maze
+) -> None:
     """Generates two new random values for entry and exit.
     Updates the config dictionary.
     Checks if the value are valid, else loops itself until it finds
@@ -79,7 +82,11 @@ def new_entry_exit_option(configs: Configs, stdscr: curses.window, maze: Maze):
         valid_value = True
 
 
-def refresh_option(maze: Maze, configs: Configs, stdscr: curses.window):
+def refresh_option(
+        maze: Maze,
+        configs: Configs,
+        stdscr: curses.window
+        ) -> Maze:
     """Refresh the maze on the stdscr.
 
     Args:
@@ -103,8 +110,9 @@ def refresh_option(maze: Maze, configs: Configs, stdscr: curses.window):
 
 
 def increment_decrement_option(
-    configs: Configs, key: str, value: int | float, stdscr: curses.window, maze: Maze
-):
+    configs: Configs, key: str,
+    value: int | float, stdscr: curses.window, maze: Maze
+) -> Maze:
     """Increment/decrement the value of the config key passed as parameter.
 
     Args:
@@ -123,9 +131,9 @@ def increment_decrement_option(
                 if key != "SECONDS":
                     configs[key] = cast(int, configs[key]) - value
                 else:
-                    configs[key] = cast(float, configs[key]) - 0.5
-                    if configs[key] < 0.5:
-                        configs[key] = 0.5
+                    value = cast(float, configs[key]) - 0.5
+                    if value < 0.5:
+                        configs[key] = value
             elif ch in (ord("+"), ord("=")):
                 if key != "SECONDS":
                     configs[key] = cast(int, configs[key]) + value
@@ -175,13 +183,13 @@ def ch_parsing(
         configs["PERFECT"] = not cast(bool, configs["PERFECT"])
         print_legend(stdscr, configs)
         if maze.generated:
-            if configs["PERFECT"] == True:
+            if configs["PERFECT"] is True:
                 restore_perfect_maze(configs, maze, stdscr)
                 maze_stats_to_txt(configs, maze, maze.path)
             else:
                 perfect_to_imperfect(configs, maze, stdscr)
                 maze_stats_to_txt(configs, maze, maze.path)
-        if maze.generated_path == True:
+        if maze.generated_path is True:
             solve_maze_path(configs, maze, stdscr)
             maze_stats_to_txt(configs, maze, maze.path)
         else:

@@ -67,8 +67,10 @@ class MazeGenerator:
             [4, 6],
         )
         for cell in self.ft_logo:
-            cell[0] += (horizontal_offset := (self.width - 5) // 2)
-            cell[1] += (vertical_offset := (self.height - 7) // 2)
+            horizontal_offset = (self.width - 5) // 2
+            vertical_offset = (self.height - 7) // 2
+            cell[0] += horizontal_offset
+            cell[1] += vertical_offset
 
         self.maze: list[list[Cell]] = []
         cell_counter: int = 0
@@ -76,13 +78,29 @@ class MazeGenerator:
             rows: list[Cell] = []
             for y in range(self.height):
                 for ft_x, ft_y in self.ft_logo:
-                    if ft_x == x and ft_y == y and self.width >= 5 and self.height >= 7:
+                    if (
+                        ft_x == x and ft_y == y and
+                        self.width >= 5 and self.height >= 7
+                    ):
                         rows.append(
-                            self.Cell(x, y, self.width, self.height, ft_logo=True)
+                            self.Cell(
+                                x,
+                                y,
+                                self.width,
+                                self.height,
+                                ft_logo=True
+                                )
                         )
                         break
                 else:
-                    rows.append(self.Cell(x, y, self.width, self.height, ft_logo=False))
+                    rows.append(
+                            self.Cell(x,
+                                      y,
+                                      self.width,
+                                      self.height,
+                                      ft_logo=False
+                                      )
+                            )
                 cell_counter += 1
             self.maze.append(rows)
         assert cell_counter >= 2
@@ -126,10 +144,9 @@ class MazeGenerator:
         Returns:
             A valid starting cell.
         """
-        while (
-            cell := self[randint(0, self.width - 1)][randint(0, self.height - 1)]
-        ).ft_logo:
-            pass
+        x, y = (randint(0, self.width - 1), randint(0, self.height - 1))
+        while (cell := self[x][y]).ft_logo:
+            x, y = (randint(0, self.width - 1), randint(0, self.height - 1))
         return cell
 
     def _valid_walls(self, cell: Cell) -> list[Wall]:
@@ -163,7 +180,8 @@ class MazeGenerator:
                 cell.y == self.height - 1 and wall.name == "RIGHT"
             ):
                 continue
-            cell2 = self[(i := cell.adjacent_cell(cast(str, wall.name)))[0]][i[1]]
+            x, y = cell.adjacent_cell(cast(str, wall.name))
+            cell2 = self[x][y]
             if cell2.ft_logo is True:
                 continue
             if not cell2.is_visited:
@@ -191,8 +209,9 @@ class MazeGenerator:
             vertical_offset: The vertical screen offset.
             seconds: The animation duration.
         """
-        current.print_self(stdscr, palette, horizontal_offset, vertical_offset)
-        adjacent.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+        param = (stdscr, palette, horizontal_offset, vertical_offset)
+        current.print_self(*param)
+        adjacent.print_self(*param)
         stdscr.refresh()
         sleep(seconds / (self.height * self.width))
 
@@ -225,9 +244,8 @@ class MazeGenerator:
             except IndexError:  # choice riceve lista vuota
                 cells.remove(current)
                 continue
-            adjacent = self[(xy := current.adjacent_cell(cast(str, wall.name)))[0]][
-                xy[1]
-            ]
+            x, y = current.adjacent_cell(cast(str, wall.name))
+            adjacent = self[x][y]
             adjacent.is_visited = True
             cells.append(adjacent)
             wall2 = wall.opposite_wall()
@@ -283,7 +301,8 @@ class MazeGenerator:
         stack[0].is_visited = True
         while stack:
             current = stack.pop()
-            closest: list[tuple[Cell, Wall]] = self._valid_closest_cells(current)
+            CellWall = list[tuple[Cell, Wall]]
+            closest: CellWall = self._valid_closest_cells(current)
             if closest:
                 stack.append(current)
                 adjacent, wall = choice(closest)
@@ -418,7 +437,11 @@ class MazeGenerator:
             stdscr.refresh()
             sleep(seconds / (self.height * self.width))
 
-    def coordinates_to_cell(self, config_cell: tuple[int, int], node_type: str) -> Cell:
+    def coordinates_to_cell(
+            self,
+            config_cell: tuple[int, int],
+            node_type: str
+            ) -> Cell:
         """Get a cell and mark it as entry or exit.
 
         Args:
@@ -467,7 +490,6 @@ class MazeGenerator:
             The path directions, or an empty string if no path exists.
         """
         from collections import deque
-        from itertools import chain
 
         # resetta a ogni chiamata
         for row in self.maze:
@@ -487,7 +509,12 @@ class MazeGenerator:
         exit_cell = self.coordinates_to_cell(self.exit, "Exit")
         for row in self.maze:
             for cell in row:
-                cell.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+                cell.print_self(
+                        stdscr,
+                        palette,
+                        horizontal_offset,
+                        vertical_offset
+                        )
         stdscr.refresh()
 
         exploring = deque([entry_cell])
@@ -520,7 +547,12 @@ class MazeGenerator:
                 if curr == entry_cell:
                     break
                 path.append(curr.direction)
-                curr.print_self(stdscr, palette, horizontal_offset, vertical_offset)
+                curr.print_self(
+                        stdscr,
+                        palette,
+                        horizontal_offset,
+                        vertical_offset
+                        )
                 stdscr.refresh()
                 sleep(seconds / (self.width * self.height))
 

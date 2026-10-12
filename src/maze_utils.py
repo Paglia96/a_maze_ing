@@ -136,7 +136,6 @@ def print_legend(stdscr: curses.window, configs: Configs) -> None:
         "n = pathfinder | e = new random entry-exit",
         f"c = color palette | k = Perfect: {configs['PERFECT']}",
         f"g = generation algorithm (current: {configs['GEN_ALGORITHM']})",
-        f"p = pathfinder algorithm (current: {configs['SOLVING_ALGORITHM']})",
         "Incrementable/Decrementable options (+/- after pressing option):",
         "w = width | h = height | s = seed | t = speed",
     ]

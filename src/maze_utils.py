@@ -206,7 +206,7 @@ def generate_maze(configs: Configs, maze: Maze, stdscr: curses.window) -> None:
 
 
 def solve_maze_path(
-        configs: Configs, maze: Maze, stdscr: curses.window
+        configs: Configs, maze: Maze, stdscr: curses.window, hide: bool = False
         ) -> str:
     """Find and display the shortest path.
 
@@ -220,6 +220,6 @@ def solve_maze_path(
     """
     path = ""
     if configs["SOLVING_ALGORITHM"] == "bfs":
-        path = maze.bfs(stdscr)
+        path = maze.bfs(stdscr, hide)
     refresh_and_sleep(0, stdscr)
     return path

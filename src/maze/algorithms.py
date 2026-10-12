@@ -99,7 +99,7 @@ def dfs(
             )
 
 
-def bfs(self: MazeGenerator, stdscr: c.window) -> str:
+def bfs(self: MazeGenerator, stdscr: c.window, hide: bool = False) -> str:
     """Find the shortest path using BFS.
 
     Args:
@@ -110,12 +110,6 @@ def bfs(self: MazeGenerator, stdscr: c.window) -> str:
     """
     from collections import deque
 
-    if not hasattr(self, 'hide'):
-        self.hide = False
-    if self.hide:
-        self.hide = False
-    else:
-        self.hide = True
     # resetta a ogni chiamata
     for row in self.maze:
         for cell in row:
@@ -177,7 +171,7 @@ def bfs(self: MazeGenerator, stdscr: c.window) -> str:
                     palette,
                     horizontal_offset,
                     vertical_offset,
-                    self.hide
+                    hide
                     )
             stdscr.refresh()
             sleep(seconds / (self.width * self.height))

@@ -25,9 +25,12 @@ def maze_generation_and_stats_to_txt(
 
 
 def pathfinder_option(
-        configs: Configs, maze: Maze, stdscr: curses.window
+        configs: Configs,
+        maze: Maze,
+        stdscr: curses.window,
+        hide: bool = False
 ) -> None:
-    solve_maze_path(configs, maze, stdscr)
+    solve_maze_path(configs, maze, stdscr, hide)
     maze.generated_path = True
     maze_stats_to_txt(configs, maze, maze.path)
 
@@ -199,7 +202,10 @@ def ch_parsing(
     elif ch == ord("m"):
         maze_generation_and_stats_to_txt(configs, maze, stdscr)
     elif ch == ord("n"):
-        pathfinder_option(configs, maze, stdscr)
+        if not hasattr(ch_parsing, 'hide'):
+            ch_parsing.hide = True
+        ch_parsing.hide = not ch_parsing.hide
+        pathfinder_option(configs, maze, stdscr, ch_parsing.hide)
     elif ch == ord("o"):
         stdscr.clear()
     elif ch == ord("s"):

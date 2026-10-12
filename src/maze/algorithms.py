@@ -110,6 +110,12 @@ def bfs(self: MazeGenerator, stdscr: c.window) -> str:
     """
     from collections import deque
 
+    if not hasattr(self, 'hide'):
+        self.hide = False
+    if self.hide:
+        self.hide = False
+    else:
+        self.hide = True
     # resetta a ogni chiamata
     for row in self.maze:
         for cell in row:
@@ -170,7 +176,8 @@ def bfs(self: MazeGenerator, stdscr: c.window) -> str:
                     stdscr,
                     palette,
                     horizontal_offset,
-                    vertical_offset
+                    vertical_offset,
+                    self.hide
                     )
             stdscr.refresh()
             sleep(seconds / (self.width * self.height))
